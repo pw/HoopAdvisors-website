@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <title>HoopAdvisors</title>
+  <link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
+  >
+</head>
+<body>
+  <header>
+    <section class="hero is-primary is-small">
+      <div class="hero-body">
+        <p class="title">HoopAdvisors</p>
+        <p class="subtitle">🏀🏀🏀</p>
+      </div>
+    </section>
+  </header> 
+  <main x-data>
+    <div class="card">
+      <div class="card-content">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Home</th>
+              <th>Away</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template x-for="game in $store.games.all" :key="game.gameId">
+              <tr>
+                <td x-text="game.awayTeam + ' @ ' + game.homeTeam"></td>
+                <td x-text="game.homeScore"></td>
+                <td x-text="game.awayScore"></td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+<script>
+const socket = new WebSocket(`${window.location.origin.replace('http', 'ws')}/connect`);
+
+socket.addEventListener('open', (event) => {
+  console.log('WebSocket connection established');
+});
+
+socket.addEventListener('message', (event) => {
+  Alpine.store('games').update(JSON.parse(event.data));
+});
+
+socket.addEventListener('close', (event) => {
+  console.log('WebSocket connection closed');
+});
+
+socket.addEventListener('error', (event) => {
+  console.error('WebSocket error:', event);
+});
+
+document.addEventListener('alpine:init', () => {
+  Alpine.store('games', {
+    all: [],
+    update(game_update) {
+      const existingIndex = this.all.findIndex(game => game.gameId === game_update.gameId);
+      if (existingIndex !== -1) {
+        this.all[existingIndex] = game_update;
+      } else {
+        this.all.push(game_update);
+      }
+      this.all.sort((a, b) => b.homeScore - a.homeScore);
+    },
+  });
+});
+</script>
+</body>
+</html>
