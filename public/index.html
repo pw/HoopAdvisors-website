@@ -33,7 +33,7 @@
           <tbody>
             <template x-for="game in $store.games.all" :key="game.gameId">
               <tr>
-                <td x-text="game.awayTeam + ' @ ' + game.homeTeam"></td>
+                <td><a :href="game.url" x-text="game.awayTeam + ' @ ' + game.homeTeam"></a></td>
                 <td x-text="game.homeScore"></td>
                 <td x-text="game.awayScore"></td>
               </tr>
