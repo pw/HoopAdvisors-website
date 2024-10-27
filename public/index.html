@@ -41,64 +41,66 @@
         <ul class="list-group list-group-flush">
           <template x-for="game in $store.games.all" :key="game.gameId">
             <li class="list-group-item" 
-                :class="{'bg-dark': game.awayLeadBy10OrMore && game.hasComeback}">
-              <div class="d-flex justify-content-between align-items-center">
+                :class="{'bg-success-subtle': game.awayLeadBy10OrMore && game.hasComeback}">
+              <div class="row align-items-center">
                 <!-- Left Section: Link-out icon and team names -->
-                <div class="d-flex align-items-center">
-                  <a :href="game.url" target="_blank" class="me-2" aria-label="View Game Details">
-                    <i class="bi bi-box-arrow-up-right"></i>
-                  </a>
-                  <strong x-text="game.awayTeam + ' @ ' + game.homeTeam"></strong>
+                <div class="col-4">
+                  <div class="d-flex align-items-center">
+                    <a :href="game.url" target="_blank" class="me-2" aria-label="View Game Details">
+                      <i class="bi bi-box-arrow-up-right"></i>
+                    </a>
+                    <strong x-text="game.awayTeam + ' @ ' + game.homeTeam"></strong>
+                  </div>
                 </div>
                 
                 <!-- Middle Section: Progress Bars and Conditional Icons -->
-                <div class="d-flex align-items-center flex-grow-1 mx-3">
-                  <!-- Progress towards maxAwayLead -->
-                  <template x-if="!game.awayLeadBy10OrMore">
-                    <div class="progress me-3" style="width: 100px;">
-                      <div 
-                        class="progress-bar bg-warning" 
-                        role="progressbar" 
-                        :style="{ width: (game.maxAwayLead * 10) + '%' }" 
-                        aria-valuenow="game.maxAwayLead" 
-                        aria-valuemin="0" 
-                        aria-valuemax="100">
-                        <!-- Progress bar without text -->
+                <div class="col-7">
+                  <div class="d-flex align-items-center">
+                    <!-- Progress towards maxAwayLead -->
+                    <template x-if="!game.awayLeadBy10OrMore">
+                      <div class="progress me-3" style="width: 100px;">
+                        <div 
+                          class="progress-bar bg-warning" 
+                          role="progressbar" 
+                          :style="{ width: (game.maxAwayLead * 10) + '%' }" 
+                          aria-valuenow="game.maxAwayLead" 
+                          aria-valuemin="0" 
+                          aria-valuemax="100">
+                        </div>
                       </div>
-                    </div>
-                  </template>
-                  <template x-if="game.awayLeadBy10OrMore">
-                    <!-- Checkmark replaces the progress bar once maxAwayLead is reached -->
-                    <i class="bi bi-check-circle-fill text-success me-3" title="Away lead achieved"></i>
-                  </template>
-  
-                  <!-- Progress towards home team comeback -->
-                  <template x-if="game.awayLeadBy10OrMore && !game.hasComeback">
-                    <div class="progress me-3" style="width: 100px;">
-                      <div 
-                        class="progress-bar bg-danger" 
-                        role="progressbar" 
-                        :style="{ width: (((10 - game.closestHomeLead) / 8) * 100) + '%' }" 
-                        aria-valuenow="game.closestHomeLead" 
-                        aria-valuemin="0" 
-                        aria-valuemax="100">
-                        <!-- Progress bar without text -->
+                    </template>
+                    <template x-if="game.awayLeadBy10OrMore">
+                      <i class="bi bi-check-circle-fill text-success me-3" title="Away lead achieved"></i>
+                    </template>
+
+                    <!-- Progress towards home team comeback -->
+                    <template x-if="game.awayLeadBy10OrMore && !game.hasComeback">
+                      <div class="progress me-3" style="width: 100px;">
+                        <div 
+                          class="progress-bar bg-danger" 
+                          role="progressbar" 
+                          :style="{ width: (((10 - game.closestHomeLead) / 8) * 100) + '%' }" 
+                          aria-valuenow="game.closestHomeLead" 
+                          aria-valuemin="0" 
+                          aria-valuemax="100">
+                        </div>
                       </div>
-                    </div>
-                  </template>
-                  <template x-if="game.hasComeback">
-                    <!-- Checkmark and explosion icon replace the progress bar once comeback is achieved -->
-                    <i class="bi bi-check-circle-fill text-success me-3" title="Comeback achieved"></i>
-                  </template>
-                  <template x-if="game.hasComeback">
-                    <i class="bi bi-fire text-danger" title="Explosion!"></i>
-                  </template>                  
+                    </template>
+                    <template x-if="game.hasComeback">
+                      <i class="bi bi-check-circle-fill text-success me-3" title="Comeback achieved"></i>
+                    </template>
+                    <template x-if="game.hasComeback">
+                      <i class="bi bi-fire text-danger" title="Explosion!"></i>
+                    </template>                  
+                  </div>
                 </div>
-  
+
                 <!-- Right Section: Scores -->
-                <span class="badge bg-secondary">
-                  <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
-                </span>
+                <div class="col-1 text-end">
+                  <span class="badge bg-secondary">
+                    <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
+                  </span>
+                </div>
               </div>
             </li>
           </template>
@@ -114,7 +116,17 @@ socket.addEventListener('open', (event) => {
 });
 
 socket.addEventListener('message', (event) => {
-  Alpine.store('games').update(JSON.parse(event.data));
+  const data = JSON.parse(event.data);
+  
+  // Handle initial connection message with multiple games
+  if (data.type === 'initial') {
+    data.games.forEach(game => {
+      Alpine.store('games').update(game);
+    });
+  } else {
+    // Handle regular single-game updates
+    Alpine.store('games').update(data);
+  }
 });
 
 socket.addEventListener('close', (event) => {
@@ -128,6 +140,35 @@ socket.addEventListener('error', (event) => {
 document.addEventListener('alpine:init', () => {
   Alpine.store('games', {
     all: [],
+    
+    // Add sorting method
+    sortGames() {
+      this.all.sort((a, b) => {
+        // First priority: hasComeback games go first
+        if (a.hasComeback && !b.hasComeback) return -1;
+        if (!a.hasComeback && b.hasComeback) return 1;
+        
+        // Second priority: games with awayLeadBy10OrMore but no comeback
+        // sorted by closestHomeLead (lowest to highest)
+        if (a.awayLeadBy10OrMore && b.awayLeadBy10OrMore && !a.hasComeback && !b.hasComeback) {
+          return a.closestHomeLead - b.closestHomeLead;
+        }
+        
+        // If one game has awayLeadBy10OrMore and the other doesn't,
+        // the one with awayLeadBy10OrMore goes first
+        if (a.awayLeadBy10OrMore && !b.awayLeadBy10OrMore) return -1;
+        if (!a.awayLeadBy10OrMore && b.awayLeadBy10OrMore) return 1;
+        
+        // Last priority: remaining games sorted by maxAwayLead (highest to lowest)
+        if (!a.awayLeadBy10OrMore && !b.awayLeadBy10OrMore) {
+          return b.maxAwayLead - a.maxAwayLead;
+        }
+        
+        return 0;
+      });
+    },
+    
+    // Modified update method to include sorting
     update(game_update) {
       const existingIndex = this.all.findIndex(game => game.gameId === game_update.gameId);
       if (existingIndex !== -1) {
@@ -135,6 +176,7 @@ document.addEventListener('alpine:init', () => {
       } else {
         this.all.push(game_update);
       }
+      this.sortGames(); // Sort after every update
     },
   });
 });
