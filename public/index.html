@@ -41,7 +41,7 @@
         <ul class="list-group list-group-flush">
           <template x-for="game in $store.games.all" :key="game.gameId">
             <li class="list-group-item" 
-                :class="{'bg-light': game.awayLeadBy10OrMore && game.hasComeback}">
+                :class="{'bg-dark': game.awayLeadBy10OrMore && game.hasComeback}">
               <div class="d-flex justify-content-between align-items-center">
                 <!-- Left Section: Link-out icon and team names -->
                 <div class="d-flex align-items-center">
@@ -78,7 +78,7 @@
                       <div 
                         class="progress-bar bg-danger" 
                         role="progressbar" 
-                        :style="{ width: (game.closestHomeLead * (100 / 9)) + '%' }" 
+                        :style="{ width: (((10 - game.closestHomeLead) / 8) * 100) + '%' }" 
                         aria-valuenow="game.closestHomeLead" 
                         aria-valuemin="0" 
                         aria-valuemax="100">
@@ -135,7 +135,6 @@ document.addEventListener('alpine:init', () => {
       } else {
         this.all.push(game_update);
       }
-      this.all.sort((a, b) => b.homeScore - a.homeScore);
     },
   });
 });
