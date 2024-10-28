@@ -74,7 +74,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    if (url.pathname === '/connect') {
+    if (url.pathname === '/connect' || url.pathname === '/update') {
       const id = env.SERVER.idFromName("server");
       const stub = env.SERVER.get(id);
       return await stub.fetch(request);
