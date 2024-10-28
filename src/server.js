@@ -17,19 +17,23 @@ export class Server extends DurableObject {
     });
   }
 
-  async fetch(request) {
-    if (request.url.endsWith('/connect')) {
-      const [client, server] = Object.values(new WebSocketPair());
-      this.state.acceptWebSocket(server);
-
-      // Send all current game data to the newly connected client
+  async webSocketMessage(webSocket, msg) {
+    let data = JSON.parse(msg);
+    if (data.type === 'initial') {
       if (this.gameData.size > 0) {
         const currentGames = Array.from(this.gameData.values());
-        client.send(JSON.stringify({
+        webSocket.send(JSON.stringify({
           type: 'initial',
           games: currentGames
         }));
       }
+    }
+  }
+
+  async fetch(request) {
+    if (request.url.endsWith('/connect')) {
+      const [client, server] = Object.values(new WebSocketPair());
+      this.state.acceptWebSocket(server);
 
       return new Response(null, {
         status: 101,

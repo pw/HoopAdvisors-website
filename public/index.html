@@ -44,17 +44,17 @@
                 :class="{'bg-success-subtle': game.awayLeadBy10OrMore && game.hasComeback}">
               <div class="row align-items-center">
                 <!-- Left Section: Link-out icon and team names -->
-                <div class="col-4">
+                <div class="col-5 col-sm-2">
                   <div class="d-flex align-items-center">
                     <a :href="game.url" target="_blank" class="me-2" aria-label="View Game Details">
                       <i class="bi bi-box-arrow-up-right"></i>
                     </a>
-                    <strong x-text="game.awayTeam + ' @ ' + game.homeTeam"></strong>
+                    <strong x-text="game.awayTeam + ' @ ' + game.homeTeam" class="text-truncate"></strong>
                   </div>
                 </div>
                 
                 <!-- Middle Section: Progress Bars and Conditional Icons -->
-                <div class="col-7">
+                <div class="col-4 col-sm-8">
                   <div class="d-flex align-items-center">
                     <!-- Progress towards maxAwayLead -->
                     <template x-if="!game.awayLeadBy10OrMore">
@@ -96,7 +96,10 @@
                 </div>
 
                 <!-- Right Section: Scores -->
-                <div class="col-1 text-end">
+                <div class="col-3 col-sm-2 text-end">
+                  <span class="badge bg-info">
+                    <span x-text="game.spread"></span>
+                  </span>
                   <span class="badge bg-secondary">
                     <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
                   </span>
@@ -112,7 +115,7 @@
 const socket = new WebSocket(`${window.location.origin.replace('http', 'ws')}/connect`);
 
 socket.addEventListener('open', (event) => {
-  console.log('WebSocket connection established');
+  socket.send(JSON.stringify({ type: 'initial' }));
 });
 
 socket.addEventListener('message', (event) => {
