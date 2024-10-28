@@ -1,8 +1,11 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "hoopadvisors"
-main = "src/index.js"
+main = "./index.js"
 compatibility_date = "2024-10-11"
 assets = { directory = "./public" }
+
+[vars]
+SECRET_KEY = "qz+/vZ3ZBxC3aAZ4a5brJuimOaJUVbsq825PVb/ZprI="
 
 [[durable_objects.bindings]]
 name = "SERVER"

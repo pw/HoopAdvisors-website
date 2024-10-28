@@ -1,6 +1,6 @@
 import { html } from '../lib/html.js'  // Import the helper
 
-export const slideRule = (data) => html`
+export const slideRulePage = (data) => html`
 <!DOCTYPE html>
 <html lang="en">
 <head>
