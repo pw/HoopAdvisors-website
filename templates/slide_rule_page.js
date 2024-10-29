@@ -1,18 +1,8 @@
-import { html } from '../lib/html.js'  // Import the helper
+import { html } from 'hono/html'
+import { Layout } from './components.js'
 
-export const slideRulePage = (data) => html`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="/slide_rule.js"></script>
-  <title>HoopAdvisors</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-</head>
-<body>
+export const slideRulePage = (data) => {
+  const content = html`
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container-fluid">
@@ -35,7 +25,8 @@ export const slideRulePage = (data) => html`
         </div>
       </div>
     </nav>
-  </header> 
+  </header>
+  
   <main x-data class="container mt-4">
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
@@ -60,11 +51,10 @@ export const slideRulePage = (data) => html`
                 <!-- Middle Section: Progress Bars and Conditional Icons -->
                 <div class="col-4 col-sm-8">
                   <div class="d-flex align-items-center">
-                    <!-- Progress towards maxAwayLead -->
                     <template x-if="!game.awayLeadBy10OrMore">
                       <div class="progress me-3" style="width: 100px;">
                         <div 
-                          class="progress-bar bg-warning" 
+                          class="progress-bar bg-dark" 
                           role="progressbar" 
                           :style="{ width: (game.maxAwayLead * 10) + '%' }" 
                           aria-valuenow="game.maxAwayLead" 
@@ -77,11 +67,10 @@ export const slideRulePage = (data) => html`
                       <i class="bi bi-check-circle-fill text-success me-3" title="Away lead achieved"></i>
                     </template>
 
-                    <!-- Progress towards home team comeback -->
                     <template x-if="game.awayLeadBy10OrMore && !game.hasComeback">
                       <div class="progress me-3" style="width: 100px;">
                         <div 
-                          class="progress-bar bg-danger" 
+                          class="progress-bar bg-success" 
                           role="progressbar" 
                           :style="{ width: (((10 - game.closestHomeLead) / 8) * 100) + '%' }" 
                           aria-valuenow="game.closestHomeLead" 
@@ -115,7 +104,11 @@ export const slideRulePage = (data) => html`
       </div>
     </div>
   </main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
-</html>
-`
+  <script src="/slide_rule.js"></script>
+  `
+
+  return Layout({
+    title: 'HoopAdvisors',
+    children: content
+  })
+}

@@ -6,6 +6,7 @@ assets = { directory = "./public" }
 
 [vars]
 SECRET_KEY = "qz+/vZ3ZBxC3aAZ4a5brJuimOaJUVbsq825PVb/ZprI="
+ACCESS_CODE = "b@ll"
 
 [[durable_objects.bindings]]
 name = "SERVER"

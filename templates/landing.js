@@ -1,14 +1,8 @@
-import { html } from '../lib/html.js'
+import { html } from 'hono/html'
+import { Layout } from './components.js'
 
-export const landing = () => html`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HoopAdvisors - Access Required</title>
-  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+export const landing = () => {
+  const content = html`
   <style>
     .hero-container {
       position: relative;
@@ -58,13 +52,10 @@ export const landing = () => html`
       border: none;
     }
   </style>
-</head>
-<body>
-  <!-- Hero Section with Video -->
+  
   <div class="hero-container">
     <video class="hero-video" autoplay muted loop playsinline>
       <source src="/hero-video.mp4" type="video/mp4">
-      <!-- Fallback if video doesn't load -->
       Your browser does not support the video tag.
     </video>
     <div class="hero-content">
@@ -73,7 +64,6 @@ export const landing = () => html`
     </div>
   </div>
 
-  <!-- Access Form Section -->
   <main x-data="accessForm" class="container">
     <div class="row justify-content-center">
       <div class="col-md-6">
@@ -121,7 +111,7 @@ export const landing = () => html`
           });
 
           if (response.ok) {
-            window.location.href = '/dashboard';
+            window.location.href = '/';
           } else {
             this.error = 'Invalid access code';
           }
@@ -129,6 +119,10 @@ export const landing = () => html`
       }));
     });
   </script>
-</body>
-</html>
-` 
+  `
+  
+  return Layout({ 
+    title: 'HoopAdvisors - Access Required',
+    children: content 
+  })
+}
