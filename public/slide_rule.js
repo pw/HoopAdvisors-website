@@ -23,6 +23,13 @@ document.addEventListener('alpine:init', () => {
       });
     },
     
+    deleteGame(gameId) {
+      const index = this.all.findIndex(game => game.gameId === gameId);
+      if (index !== -1) {
+        this.all.splice(index, 1);
+      }
+    },
+    
     update(game_update) {
       const existingIndex = this.all.findIndex(game => game.gameId === game_update.gameId);
       if (existingIndex !== -1) {
@@ -50,6 +57,9 @@ socket.addEventListener('message', (event) => {
     data.games.forEach(game => {
       Alpine.store('games').update(game);
     });
+  } else if (data.type === 'final') {
+    // Handle game deletion when game is final
+    Alpine.store('games').deleteGame(data.gameId);
   } else {
     // Handle regular single-game updates
     Alpine.store('games').update(data);
