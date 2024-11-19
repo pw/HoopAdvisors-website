@@ -9,7 +9,7 @@ document.addEventListener('alpine:init', () => {
         if (!a.hasComeback && b.hasComeback) return 1;
         
         if (a.awayLeadBy10OrMore && b.awayLeadBy10OrMore && !a.hasComeback && !b.hasComeback) {
-          return a.closestHomeLead - b.closestHomeLead;
+          return a.maxHomeLead - b.maxHomeLead;
         }
         
         if (a.awayLeadBy10OrMore && !b.awayLeadBy10OrMore) return -1;
