@@ -72,7 +72,7 @@ export const slideRulePage = (data) => {
                         <div 
                           class="progress-bar bg-success" 
                           role="progressbar" 
-                          :style="{ width: (((10 - game.maxHomeLead) / 8) * 100) + '%' }" 
+                          :style="{ width: (((game.maxHomeLead + 10) / 8) * 100) + '%' }" 
                           aria-valuenow="game.maxHomeLead" 
                           aria-valuemin="0" 
                           aria-valuemax="100">
