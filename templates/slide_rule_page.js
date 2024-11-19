@@ -83,8 +83,14 @@ export const slideRulePage = (data) => {
                       <i class="bi bi-check-circle-fill text-success me-3" title="Comeback achieved"></i>
                     </template>
                     <template x-if="game.hasComeback">
-                      <i class="bi bi-fire text-danger" title="Explosion!"></i>
-                    </template>                  
+                      <i class="bi bi-fire text-danger me-3" title="Explosion!"></i>
+                    </template>
+                    <template x-if="game.hasComeback && game.type !== 'final'">
+                      <span x-text="game.comebackTime"></span>
+                    </template>  
+                    <template x-if="game.type === 'final'">
+                      <span>𝐅</span>
+                    </template>
                   </div>
                 </div>
 

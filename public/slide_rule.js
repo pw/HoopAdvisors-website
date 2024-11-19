@@ -58,9 +58,11 @@ socket.addEventListener('message', (event) => {
       Alpine.store('games').update(game);
     });
   } else if (data.type === 'final') {
-    // Handle game deletion when game is final
-    Alpine.store('games').deleteGame(data.gameId);
-  } else {
+    Alpine.store('games').update(data);
+    if (!data.hasComeback) {
+      Alpine.store('games').deleteGame(data.gameId);
+    }
+  } else if (data.type === 'update') {
     // Handle regular single-game updates
     Alpine.store('games').update(data);
   }
