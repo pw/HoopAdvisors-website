@@ -32,6 +32,13 @@ app.all('/update', async (c) => {
   return await stub.fetch(c.req.raw);
 });
 
+app.all('/clear', async (c) => {
+  const env = c.env;
+  const id = env.SERVER.idFromName("server");
+  const stub = env.SERVER.get(id);
+  return await stub.fetch(c.req.raw);
+});
+
 app.post('/validate', async (c) => {
   const { code } = await c.req.json();
   
