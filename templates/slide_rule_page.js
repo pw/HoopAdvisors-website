@@ -96,9 +96,11 @@ export const slideRulePage = (data) => {
 
                 <!-- Right Section: Scores -->
                 <div class="col-3 col-sm-2 text-end">
-                  <span class="badge bg-info">
-                    <span x-text="game.spread"></span>
-                  </span>
+                  <template x-if="game.spread">
+                    <span class="badge bg-info">
+                      <span x-text="game.spread"></span>
+                    </span>
+                  </template>
                   <span class="badge bg-secondary">
                     <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
                   </span>
