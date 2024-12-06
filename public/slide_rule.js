@@ -42,12 +42,18 @@ document.addEventListener('alpine:init', () => {
   });
 });
 
-const currentDate = new Intl.DateTimeFormat('en-US', {
-  year: 'numeric',
-  month: '2-digit',
-  day: '2-digit'
-}).format(new Date());
-const formattedDate = currentDate.replace(/\//g, '');
+let formattedDate;
+// get formatted date from query params if available
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('date')) {
+  formattedDate = urlParams.get('date');
+} else {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  formattedDate = `${year}${month}${day}`;
+}
 
 const socket = new WebSocket(`${window.location.origin.replace('http', 'ws')}/connect?date=${formattedDate}`);
 
@@ -56,6 +62,7 @@ socket.addEventListener('open', (event) => {
 });
 
 socket.addEventListener('message', (event) => {
+  console.log('message', event);
   const data = JSON.parse(event.data);
   
   // Handle initial connection message with multiple games

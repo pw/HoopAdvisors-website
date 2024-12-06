@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { WebsocketServer } from './lib/websocket_server.js';
 import { GameServer } from './lib/game_server.js';
 import { slideRulePage } from './templates/slide_rule_page.js'
+import { gamePage } from './templates/game_page.js'
 import { landing } from './templates/landing.js'
 import { authMiddleware, createSignedToken } from './lib/auth.js';
 
@@ -21,24 +22,28 @@ app.get('/', async (c) => {
 
 app.all('/connect', async (c) => {
   const env = c.env;
-  const id = env.WEBSOCKET_SERVER.idFromName("server");
+  const date = c.req.query['date'];
+  const id = env.WEBSOCKET_SERVER.idFromName(date);
   const stub = env.WEBSOCKET_SERVER.get(id);
-  return await stub.connect();
+  return await stub.fetch(c.req.raw);
 });
 
 app.all('/update', async (c) => {
   const env = c.env;
   const id = env.GAME_SERVER.idFromName(c.req.json().gameId);
   const stub = env.GAME_SERVER.get(id);
-  return await stub.update(c.req.json());
+  const json = await c.req.json();
+  await stub.update(json);
+  return c.json({ success: true }, { status: 200 });
 });
 
 app.all('/game', async (c) => {
   const env = c.env;
-  const id = env.GAME.idFromName(c.req.query.game_id);
-  const stub = env.GAME.get(id);
+  const gameId = c.req.query['id'];
+  const id = env.GAME_SERVER.idFromName(gameId);
+  const stub = env.GAME_SERVER.get(id);
   const gameData = await stub.getGameData();
-  return c.html(slideRulePage(gameData));
+  return c.html(gamePage(gameData));
 });
 
 app.all('/clear', async (c) => {
