@@ -1,10 +1,11 @@
 import { Hono } from 'hono';
-import { Server } from './lib/server.js';
+import { WebsocketServer } from './lib/websocket_server.js';
+import { GameServer } from './lib/game_server.js';
 import { slideRulePage } from './templates/slide_rule_page.js'
 import { landing } from './templates/landing.js'
 import { authMiddleware, createSignedToken } from './lib/auth.js';
 
-export { Server };
+export { WebsocketServer, GameServer };
 
 // Create Hono app instance
 const app = new Hono();
@@ -20,16 +21,24 @@ app.get('/', async (c) => {
 
 app.all('/connect', async (c) => {
   const env = c.env;
-  const id = env.SERVER.idFromName("server");
-  const stub = env.SERVER.get(id);
-  return await stub.fetch(c.req.raw);
+  const id = env.WEBSOCKET_SERVER.idFromName("server");
+  const stub = env.WEBSOCKET_SERVER.get(id);
+  return await stub.connect();
 });
 
 app.all('/update', async (c) => {
   const env = c.env;
-  const id = env.SERVER.idFromName("server");
-  const stub = env.SERVER.get(id);
-  return await stub.fetch(c.req.raw);
+  const id = env.GAME_SERVER.idFromName(c.req.json().gameId);
+  const stub = env.GAME_SERVER.get(id);
+  return await stub.update(c.req.json());
+});
+
+app.all('/game', async (c) => {
+  const env = c.env;
+  const id = env.GAME.idFromName(c.req.query.game_id);
+  const stub = env.GAME.get(id);
+  const gameData = await stub.getGameData();
+  return c.html(slideRulePage(gameData));
 });
 
 app.all('/clear', async (c) => {

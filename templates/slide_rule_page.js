@@ -1,32 +1,8 @@
 import { html } from 'hono/html'
-import { Layout } from './components.js'
+import { LayoutWithNavbar } from './components.js'
 
 export const slideRulePage = (data) => {
   const content = html`
-  <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">HoopAdvisors 🏀🏀🏀</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Games</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Teams</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
-  </header>
-  
   <main x-data class="container mt-4">
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
@@ -115,7 +91,7 @@ export const slideRulePage = (data) => {
   <script src="/slide_rule.js"></script>
   `
 
-  return Layout({
+  return LayoutWithNavbar({
     title: 'HoopAdvisors',
     children: content
   })

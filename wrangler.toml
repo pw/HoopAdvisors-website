@@ -9,12 +9,21 @@ SECRET_KEY = "qz+/vZ3ZBxC3aAZ4a5brJuimOaJUVbsq825PVb/ZprI="
 ACCESS_CODE = "b@ll"
 
 [[durable_objects.bindings]]
-name = "SERVER"
-class_name = "Server"
+name = "WEBSOCKET_SERVER"
+class_name = "WebsocketServer"
+
+[[durable_objects.bindings]]
+name = "GAME_SERVER"
+class_name = "GameServer"
 
 [[migrations]]
 tag = "v1"
 new_classes = ["Server"]
+
+[[migrations]]
+tag = "v2"
+renamed_classes = [{from = "Server", to = "WebsocketServer" }]
+new_classes = ["GameServer"]
 
 [observability]
 enabled = true

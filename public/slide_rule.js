@@ -42,8 +42,14 @@ document.addEventListener('alpine:init', () => {
   });
 });
 
-// Then set up the WebSocket
-const socket = new WebSocket(`${window.location.origin.replace('http', 'ws')}/connect`);
+const currentDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit'
+}).format(new Date());
+const formattedDate = currentDate.replace(/\//g, '');
+
+const socket = new WebSocket(`${window.location.origin.replace('http', 'ws')}/connect?date=${formattedDate}`);
 
 socket.addEventListener('open', (event) => {
   socket.send(JSON.stringify({ type: 'initial' }));
