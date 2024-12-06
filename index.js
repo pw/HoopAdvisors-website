@@ -30,9 +30,9 @@ app.all('/connect', async (c) => {
 
 app.all('/update', async (c) => {
   const env = c.env;
-  const id = env.GAME_SERVER.idFromName(c.req.json().gameId);
-  const stub = env.GAME_SERVER.get(id);
   const json = await c.req.json();
+  const id = env.GAME_SERVER.idFromName(json.gameId);
+  const stub = env.GAME_SERVER.get(id);
   await stub.update(json);
   return c.json({ success: true }, { status: 200 });
 });
