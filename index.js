@@ -39,7 +39,7 @@ app.all('/update', async (c) => {
 
 app.all('/game', async (c) => {
   const env = c.env;
-  const gameId = c.req.query['id'];
+  const gameId = c.req.query()['id'];
   const id = env.GAME_SERVER.idFromName(gameId);
   const stub = env.GAME_SERVER.get(id);
   const gameData = await stub.getGameData();
