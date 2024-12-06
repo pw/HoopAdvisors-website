@@ -22,7 +22,7 @@ app.get('/', async (c) => {
 
 app.all('/connect', async (c) => {
   const env = c.env;
-  const date = c.req.query['date'];
+  const date = c.req.query()['date'];
   const id = env.WEBSOCKET_SERVER.idFromName(date);
   const stub = env.WEBSOCKET_SERVER.get(id);
   return await stub.fetch(c.req.raw);
@@ -43,7 +43,7 @@ app.all('/game', async (c) => {
   const id = env.GAME_SERVER.idFromName(gameId);
   const stub = env.GAME_SERVER.get(id);
   const gameData = await stub.getGameData();
-  return c.html(gamePage(gameData));
+  return c.html(gamePage(Array.from(gameData.values())));
 });
 
 app.all('/clear', async (c) => {
