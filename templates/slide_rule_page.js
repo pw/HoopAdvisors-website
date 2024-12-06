@@ -19,10 +19,7 @@ export const slideRulePage = (data) => {
                   <div class="d-flex align-items-center">
                     <a :href="game.url" target="_blank" class="me-2" aria-label="View Game Details">
                       <i class="bi bi-box-arrow-up-right"></i>
-                    </a>
-                    <a :href="'/game?id=' + game.gameId" target="_blank" class="me-2" aria-label="View Game Details">
-                      <i class="bi bi-box-arrow-up-right"></i>
-                    </a>                    
+                    </a>                  
                     <strong x-text="game.awayTeam + ' @ ' + game.homeTeam" class="text-truncate"></strong>
                   </div>
                 </div>
