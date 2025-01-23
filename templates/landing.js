@@ -1,7 +1,7 @@
 import { html } from 'hono/html'
 import { Layout } from './components.js'
 
-export const landing = () => {
+export const landing = (originalUrl) => {
   const content = html`
   <style>
     .hero-container {
@@ -84,6 +84,7 @@ export const landing = () => {
                   placeholder="Enter your access code"
                   required
                 >
+                <input type="hidden" id="originalUrl" value="${originalUrl || '/'}">
                 <div class="invalid-feedback" x-text="error"></div>
               </div>
               <button type="submit" class="btn btn-primary btn-lg w-100">
@@ -111,7 +112,8 @@ export const landing = () => {
           });
 
           if (response.ok) {
-            window.location.href = '/';
+            const originalUrl = document.getElementById('originalUrl').value;
+            window.location.href = originalUrl;
           } else {
             this.error = 'Invalid access code';
           }

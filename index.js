@@ -4,6 +4,7 @@ import { GameServer } from './lib/game_server.js';
 import { slideRulePage } from './templates/slide_rule_page.js'
 import { gamePage } from './templates/game_page.js'
 import { landing } from './templates/landing.js'
+import { momentumPage } from './templates/momentum_page.js'
 import { authMiddleware, createSignedToken } from './lib/auth.js';
 
 export { WebsocketServer, GameServer };
@@ -17,7 +18,12 @@ app.use('*', authMiddleware);
 // Route handlers
 app.get('/', async (c) => {
   const isAuthenticated = c.get('isAuthenticated');
-  return c.html(isAuthenticated ? slideRulePage() : landing());
+  return c.html(isAuthenticated ? slideRulePage() : landing(c.req.url));
+});
+
+app.get('/qualifiers', async (c) => {
+  const isAuthenticated = c.get('isAuthenticated');
+  return c.html(isAuthenticated ? momentumPage() : landing(c.req.url));
 });
 
 app.all('/connect', async (c) => {

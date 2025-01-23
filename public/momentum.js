@@ -1,0 +1,78 @@
+// Initialize the store first
+document.addEventListener('alpine:init', () => {
+  Alpine.store('games', {
+    all: [],
+    
+    sortGames() {
+      this.all.sort((a, b) => {
+        if (a.qualified && !b.qualified) return -1;
+        if (!a.qualified && b.qualified) return 1;
+        return b.qualifierSort - a.qualifierSort;
+      });
+    },
+    
+    deleteGame(gameId) {
+      const index = this.all.findIndex(game => game.gameId === gameId);
+      if (index !== -1) {
+        this.all.splice(index, 1);
+      }
+    },
+    
+    update(game_update) {
+      const existingIndex = this.all.findIndex(game => game.gameId === game_update.gameId);
+      if (existingIndex !== -1) {
+        this.all[existingIndex] = game_update;
+      } else {
+        this.all.push(game_update);
+      }
+      this.sortGames();
+    }
+  });
+});
+
+let formattedDate;
+// get formatted date from query params if available
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('date')) {
+  formattedDate = urlParams.get('date');
+} else {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  formattedDate = `${year}${month}${day}`;
+}
+
+const socket = new WebSocket(`${window.location.origin.replace('http', 'ws')}/connect?date=${formattedDate}`);
+
+socket.addEventListener('open', (event) => {
+  socket.send(JSON.stringify({ type: 'initial' }));
+});
+
+socket.addEventListener('message', (event) => {
+  console.log('message', event);
+  const data = JSON.parse(event.data);
+  
+  // Handle initial connection message with multiple games
+  if (data.type === 'initial') {
+    data.games.forEach(game => {
+      Alpine.store('games').update(game);
+    });
+  } else if (data.type === 'final') {
+    Alpine.store('games').update(data);
+    if (!data.qualified) {
+      Alpine.store('games').deleteGame(data.gameId);
+    }
+  } else if (data.type === 'update') {
+    // Handle regular single-game updates
+    Alpine.store('games').update(data);
+  }
+});
+
+socket.addEventListener('close', (event) => {
+  console.log('WebSocket connection closed');
+});
+
+socket.addEventListener('error', (event) => {
+  console.error('WebSocket error:', event);
+}); 
