@@ -43,36 +43,50 @@ if (urlParams.has('date')) {
   formattedDate = `${year}${month}${day}`;
 }
 
-const socket = new WebSocket(`${window.location.origin.replace('http', 'ws')}/connect?date=${formattedDate}`);
+// Use production WebSocket URL if running locally
+const wsUrl = window.location.hostname === 'localhost' 
+  ? 'wss://hoopadvisors.pw3.workers.dev/connect'  // Production URL
+  : `${window.location.origin.replace('http', 'ws')}/connect`;
 
-socket.addEventListener('open', (event) => {
-  socket.send(JSON.stringify({ type: 'initial' }));
-});
+let socket = null;
 
-socket.addEventListener('message', (event) => {
-  console.log('message', event);
-  const data = JSON.parse(event.data);
-  
-  // Handle initial connection message with multiple games
-  if (data.type === 'initial') {
-    data.games.forEach(game => {
-      Alpine.store('games').update(game);
-    });
-  } else if (data.type === 'final') {
-    Alpine.store('games').update(data);
-    if (!data.qualified) {
-      Alpine.store('games').deleteGame(data.gameId);
+function connectWebSocket() {
+  socket = new WebSocket(`${wsUrl}?date=${formattedDate}`);
+
+  socket.addEventListener('open', (event) => {
+    console.log('WebSocket connected');
+    socket.send(JSON.stringify({ type: 'initial' }));
+  });
+
+  socket.addEventListener('message', (event) => {
+    console.log('message', event);
+    const data = JSON.parse(event.data);
+    
+    // Handle initial connection message with multiple games
+    if (data.type === 'initial') {
+      data.games.forEach(game => {
+        Alpine.store('games').update(game);
+      });
+    } else if (data.type === 'final') {
+      Alpine.store('games').update(data);
+      if (!data.qualified) {
+        Alpine.store('games').deleteGame(data.gameId);
+      }
+    } else if (data.type === 'update') {
+      // Handle regular single-game updates
+      Alpine.store('games').update(data);
     }
-  } else if (data.type === 'update') {
-    // Handle regular single-game updates
-    Alpine.store('games').update(data);
-  }
-});
+  });
 
-socket.addEventListener('close', (event) => {
-  console.log('WebSocket connection closed');
-});
+  socket.addEventListener('close', (event) => {
+    console.log('WebSocket connection closed, attempting to reconnect...');
+    connectWebSocket();
+  });
 
-socket.addEventListener('error', (event) => {
-  console.error('WebSocket error:', event);
-}); 
+  socket.addEventListener('error', (event) => {
+    console.error('WebSocket error:', event);
+  });
+}
+
+// Initial connection
+connectWebSocket(); 

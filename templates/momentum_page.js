@@ -3,14 +3,92 @@ import { LayoutWithNavbar } from './components.js'
 
 export const momentumPage = (data) => {
   const content = html`
-  <main x-data="{ debug: new URLSearchParams(window.location.search).has('debug') }" class="container mt-4">
+  <main x-data="{ 
+    debug: new URLSearchParams(window.location.search).has('debug'),
+    showFinished: true,
+    showAll: false,
+    date: new URLSearchParams(window.location.search).get('date') || (() => {
+      const now = new Date();
+      return now.getFullYear() + 
+             String(now.getMonth() + 1).padStart(2, '0') + 
+             String(now.getDate()).padStart(2, '0');
+    })(),
+    selectedDate: null,
+    applyDate() {
+      if (!this.selectedDate) return;
+      const newDate = this.selectedDate.replace(/-/g, '');
+      window.location.href = '/qualifiers?date=' + newDate + 
+        (this.showAll ? '&debug=true' : '');
+    }
+  }" class="container mt-4">
+    <!-- Controls Toolbar -->
+    <div class="card shadow mb-3">
+      <div class="card-body">
+        <div class="row row-cols-1 row-cols-md-3 g-3">
+          <!-- Date Selector -->
+          <div class="col">
+            <div class="d-flex align-items-center gap-2">
+              <div class="flex-grow-1">
+                <label for="dateSelect" class="form-label mb-1">Date:</label>
+                <div class="input-group">
+                  <input 
+                    type="date" 
+                    class="form-control" 
+                    id="dateSelect"
+                    :value="date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')"
+                    @change="selectedDate = $event.target.value"
+                  >
+                  <button 
+                    class="btn btn-primary d-md-none" 
+                    type="button"
+                    @click="applyDate()"
+                    :disabled="!selectedDate"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Show All Metrics Toggle -->
+          <div class="col">
+            <div class="form-check form-switch">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                role="switch" 
+                id="showAllSwitch"
+                x-model="showAll"
+                @change="debug = showAll"
+              >
+              <label class="form-check-label" for="showAllSwitch">Show All Metrics</label>
+            </div>
+          </div>
+          <!-- Show Finished Games Toggle -->
+          <div class="col">
+            <div class="form-check form-switch">
+              <input 
+                class="form-check-input" 
+                type="checkbox" 
+                role="switch" 
+                id="showFinishedSwitch"
+                x-model="showFinished"
+              >
+              <label class="form-check-label" for="showFinishedSwitch">Show Finished Games</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
         <h5 class="mb-0">Momentum Qualifiers</h5>
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
-          <template x-for="game in $store.games.all" :key="game.gameId">
+          <template x-for="game in $store.games.all.filter(g => showFinished || g.type !== 'final')" :key="game.gameId">
             <li class="list-group-item" :class="{'bg-success-subtle': game.qualified}">
               <div class="row align-items-center g-3">
                 <!-- Left Section: Links and Teams -->
@@ -29,7 +107,7 @@ export const momentumPage = (data) => {
                 <!-- Middle Section: Progress Bars -->
                 <div class="col-12 col-sm-7">
                   <!-- +15 Progress Bar -->
-                  <template x-if="debug || game.activeQualifiers.includes('plusFifteen')">
+                  <template x-if="showAll || game.activeQualifiers.includes('plusFifteen')">
                     <div class="mb-2">
                       <small class="text-muted">+15:</small>
                       <div class="progress">
@@ -43,7 +121,7 @@ export const momentumPage = (data) => {
                   </template>
 
                   <!-- +12 Progress Bar -->
-                  <template x-if="debug || game.activeQualifiers.includes('plusTwelve')">
+                  <template x-if="showAll || game.activeQualifiers.includes('plusTwelve')">
                     <div class="mb-2">
                       <small class="text-muted">+12:</small>
                       <div class="progress">
@@ -57,7 +135,7 @@ export const momentumPage = (data) => {
                   </template>
 
                   <!-- +12₁_₂ Progress Bar -->
-                  <template x-if="debug || game.activeQualifiers.includes('plusTwelve1_2')">
+                  <template x-if="showAll || game.activeQualifiers.includes('plusTwelve1_2')">
                     <div class="mb-2">
                       <small class="text-muted">+12₁_₂:</small>
                       <div class="progress">
@@ -71,7 +149,7 @@ export const momentumPage = (data) => {
                   </template>
 
                   <!-- +12₂_₂ Progress Bar -->
-                  <template x-if="debug || game.activeQualifiers.includes('plusTwelve2_2')">
+                  <template x-if="showAll || game.activeQualifiers.includes('plusTwelve2_2')">
                     <div class="mb-2">
                       <small class="text-muted">+12₂_₂:</small>
                       <div class="progress">
