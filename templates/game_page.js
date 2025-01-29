@@ -6,7 +6,7 @@ export const gamePage = (data) => {
   const lastPlay = data[data.length - 1] || {}
   
   // Helper function to create progress bar
-  const createMomentumBar = (value, target, label) => {
+  const createMomentumBar = (value, target, label, timePeriod, actualTime) => {
     const absValue = Math.abs(value)
     const percentage = Math.min((absValue / target) * 100, 100)
     const barColor = value > 0 ? 'bg-success' : 'bg-danger'
@@ -14,7 +14,7 @@ export const gamePage = (data) => {
     return html`
       <div class="momentum-metric mb-2">
         <div class="d-flex justify-content-between mb-1">
-          <small>+${label}: ${absValue}/${target}</small>
+          <small>+${label} (${timePeriod}): ${absValue}/${target}${actualTime ? ` @ ${actualTime}` : ''}</small>
         </div>
         <div class="progress" style="height: 10px;">
           <div class="${barColor}" role="progressbar" style="width: ${percentage}%" 
@@ -164,11 +164,11 @@ export const gamePage = (data) => {
           <div class="col-md-4">
             <h5 class="mb-3">Momentum Metrics</h5>
             <div class="momentum-metrics">              
-              ${createMomentumBar(lastPlay.plusSeventeen, 17, '17')}
-              ${createMomentumBar(lastPlay.plusFifteen, 15, '15')}
-              ${createMomentumBar(lastPlay.plusTwelve, 12, '12')}
-              ${createMomentumBar(lastPlay.plusTwelve1_2, 12, '12₁_₂')}
-              ${createMomentumBar(lastPlay.plusTwelve2_2, 12, '12₂_₂')}
+              ${createMomentumBar(lastPlay.plusSeventeen, 17, '17', '20:00 to 10:00', lastPlay.plusSeventeenTime)}
+              ${createMomentumBar(lastPlay.plusFifteen, 15, '15', '15:00 to 5:00', lastPlay.plusFifteenTime)}
+              ${createMomentumBar(lastPlay.plusTwelve, 12, '12', '10:00 to HALF', lastPlay.plusTwelveTime)}
+              ${createMomentumBar(lastPlay.plusTwelve1_2, 12, '12₁_₂', '20:00 to 10:00', lastPlay.plusTwelve1_2Time)}
+              ${createMomentumBar(lastPlay.plusTwelve2_2, 12, '12₂_₂', '15:00 to 5:00', lastPlay.plusTwelve2_2Time)}
             </div>
 
             <!-- Two-sided Segments Progress Bar -->
