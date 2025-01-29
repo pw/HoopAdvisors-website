@@ -6,6 +6,7 @@ export const momentumPage = (data) => {
   <main x-data="{ 
     debug: new URLSearchParams(window.location.search).has('debug'),
     showFinished: true,
+    showDisqualified: false,
     showAll: false,
     date: new URLSearchParams(window.location.search).get('date') || (() => {
       const now = new Date();
@@ -69,6 +70,17 @@ export const momentumPage = (data) => {
             >
             <label class="form-check-label" for="showFinishedSwitch">Show Finished Games</label>
           </div>
+          <!-- Show Disqualified Games Toggle -->
+          <div class="form-check form-switch mb-0">
+            <input 
+              class="form-check-input" 
+              type="checkbox" 
+              role="switch" 
+              id="showDisqualifiedSwitch"
+              x-model="showDisqualified"
+            >
+            <label class="form-check-label" for="showDisqualifiedSwitch">Show Disqualified Games</label>
+          </div>
         </div>
       </div>
     </div>
@@ -80,7 +92,7 @@ export const momentumPage = (data) => {
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
-          <template x-for="game in $store.games.all.filter(g => showFinished || g.type !== 'final')" :key="game.gameId">
+          <template x-for="game in $store.games.all.filter(g => (showFinished || g.type !== 'final') && (showDisqualified || !g.disqualified))" :key="game.gameId">
             <li class="list-group-item" :class="{'bg-success-subtle': game.qualified}">
               <div class="row align-items-center g-3">
                 <!-- Left Section: Links and Teams -->
@@ -179,6 +191,20 @@ export const momentumPage = (data) => {
                         <span class="ms-2" x-text="game.qualifiedTime"></span>
                         <span class="ms-1 text-muted">
                           (<span x-text="game.qualifiedGameTime"></span>)
+                        </span>
+                      </small>
+                    </div>
+                  </template>
+                  <!-- Disqualified Status -->
+                  <template x-if="game.disqualified">
+                    <div class="mt-2">
+                      <i class="bi bi-x-circle-fill me-2 text-dark" 
+                         title="Disqualified"></i>
+                      <small>
+                        <span x-text="game.disqualifiedBy"></span>
+                        <span class="ms-2" x-text="game.disqualifiedTime"></span>
+                        <span class="ms-1 text-muted">
+                          (<span x-text="game.disqualifiedGameTime"></span>)
                         </span>
                       </small>
                     </div>
