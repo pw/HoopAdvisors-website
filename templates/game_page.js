@@ -166,6 +166,7 @@ export const gamePage = (data) => {
             <div class="momentum-metrics">              
               ${createMomentumBar(lastPlay.plusSeventeen, 17, '17', '20:00 to 10:00', lastPlay.plusSeventeenTime)}
               ${createMomentumBar(lastPlay.plusFifteen, 15, '15', '15:00 to 5:00', lastPlay.plusFifteenTime)}
+              ${createMomentumBar(lastPlay.plusThirteen, 13, '13', '20:00 to HALF', lastPlay.plusThirteenTime)}
               ${createMomentumBar(lastPlay.plusTwelve, 12, '12', '10:00 to HALF', lastPlay.plusTwelveTime)}
               ${createMomentumBar(lastPlay.plusTwelve1_2, 12, '12₁_₂', '20:00 to 10:00', lastPlay.plusTwelve1_2Time)}
               ${createMomentumBar(lastPlay.plusTwelve2_2, 12, '12₂_₂', '15:00 to 5:00', lastPlay.plusTwelve2_2Time)}
