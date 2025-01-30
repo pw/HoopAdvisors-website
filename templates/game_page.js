@@ -210,6 +210,13 @@ export const gamePage = (data) => {
             </div>
 
             <div class="mt-2">
+              ${lastPlay.plusSeventeenStop ? html`
+                <div class="mb-1">
+                  <small class="text-muted">+17: 
+                    <i class="bi bi-octagon-fill text-danger" title="Stop"></i>
+                  </small>
+                </div>
+              ` : ''}
               <small class="text-muted">Overall Diff: 
                 <span class="${lastPlay.overallDiff > 0 ? 'text-success' : 'text-danger'}">
                   ${lastPlay.overallDiff > 0 ? '+' : ''}${lastPlay.overallDiff}
