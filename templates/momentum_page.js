@@ -8,6 +8,7 @@ export const momentumPage = (data) => {
     showFinished: true,
     showDisqualified: false,
     showAll: false,
+    showUnderReview: false,
     date: new URLSearchParams(window.location.search).get('date') || (() => {
       const now = new Date();
       return now.getFullYear() + 
@@ -81,6 +82,17 @@ export const momentumPage = (data) => {
             >
             <label class="form-check-label" for="showDisqualifiedSwitch">Show Disqualified Games</label>
           </div>
+          <!-- Show Games Under Review Toggle -->
+          <div class="form-check form-switch mb-0">
+            <input 
+              class="form-check-input" 
+              type="checkbox" 
+              role="switch" 
+              id="showUnderReviewSwitch"
+              x-model="showUnderReview"
+            >
+            <label class="form-check-label" for="showUnderReviewSwitch">Show Games Under Review</label>
+          </div>
         </div>
       </div>
     </div>
@@ -92,7 +104,11 @@ export const momentumPage = (data) => {
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
-          <template x-for="game in $store.games.all.filter(g => (showFinished || g.type !== 'final') && (showDisqualified || !g.disqualified))" :key="game.gameId">
+          <template x-for="game in $store.games.all.filter(g => 
+            (showFinished || g.type !== 'final') && 
+            (showDisqualified || !g.disqualified) &&
+            (!showUnderReview || g.plusSeventeenStop)
+          )" :key="game.gameId">
             <li class="list-group-item" :class="{'bg-success-subtle': game.qualified}">
               <div class="row align-items-center g-3">
                 <!-- Left Section: Links and Teams -->
@@ -206,6 +222,14 @@ export const momentumPage = (data) => {
                         <span class="ms-1 text-muted">
                           (<span x-text="game.disqualifiedGameTime"></span>)
                         </span>
+                      </small>
+                    </div>
+                  </template>
+                  <!-- +17 Stop Status -->
+                  <template x-if="game.plusSeventeenStop">
+                    <div class="mt-2">
+                      <small class="text-muted">+17: 
+                        <i class="bi bi-octagon-fill text-danger" title="Stop"></i>
                       </small>
                     </div>
                   </template>
