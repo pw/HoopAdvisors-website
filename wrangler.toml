@@ -28,6 +28,6 @@ new_classes = ["GameServer"]
 [observability]
 enabled = true
 
-services = [
-  { binding = "scheduler", service = "hoopadvisors-scheduler" }
-]
+[[services]]
+binding = "scheduler"
+service = "hoopadvisors-scheduler"
