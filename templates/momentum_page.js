@@ -9,6 +9,7 @@ export const momentumPage = (data) => {
     showDisqualified: false,
     showAll: false,
     showUnderReview: false,
+    hideQualified: false,
     date: new URLSearchParams(window.location.search).get('date') || (() => {
       const now = new Date();
       return now.getFullYear() + 
@@ -26,72 +27,107 @@ export const momentumPage = (data) => {
     <!-- Controls Toolbar -->
     <div class="card shadow mb-3">
       <div class="card-body">
-        <div class="d-flex flex-wrap align-items-center gap-4">
+        <div class="d-flex flex-column flex-md-row gap-4">
           <!-- Date Selector -->
-          <div class="d-flex align-items-center gap-2">
-            <label for="dateSelect" class="form-label mb-0">Date:</label>
-            <div class="input-group">
-              <input 
-                type="date" 
-                class="form-control" 
-                id="dateSelect"
-                :value="date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')"
-                @change="selectedDate = $event.target.value"
-              >
-              <button 
-                class="btn btn-primary" 
-                type="button"
-                @click="applyDate()"
-                :disabled="!selectedDate"
-              >
-                Apply
-              </button>
+          <div class="d-flex flex-column gap-2">
+            <div class="d-flex align-items-start gap-2">
+              <label for="dateSelect" class="form-label mb-0">Date:</label>
+              <div class="input-group">
+                <input 
+                  type="date" 
+                  class="form-control" 
+                  id="dateSelect"
+                  :value="date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')"
+                  @change="selectedDate = $event.target.value"
+                >
+                <button 
+                  class="btn btn-primary" 
+                  type="button"
+                  @click="applyDate()"
+                  :disabled="!selectedDate"
+                >
+                  Apply
+                </button>
+              </div>
             </div>
-          </div>
-          <!-- Show All Metrics Toggle -->
-          <div class="form-check form-switch mb-0">
-            <input 
-              class="form-check-input" 
-              type="checkbox" 
-              role="switch" 
-              id="showAllSwitch"
-              x-model="showAll"
-              @change="debug = showAll"
+            <button 
+              class="btn btn-primary" 
+              type="button"
+              @click="getGameData()"
             >
-            <label class="form-check-label" for="showAllSwitch">Show All Metrics</label>
+              Get Data
+            </button>
           </div>
-          <!-- Show Finished Games Toggle -->
-          <div class="form-check form-switch mb-0">
-            <input 
-              class="form-check-input" 
-              type="checkbox" 
-              role="switch" 
-              id="showFinishedSwitch"
-              x-model="showFinished"
-            >
-            <label class="form-check-label" for="showFinishedSwitch">Show Finished Games</label>
-          </div>
-          <!-- Show Disqualified Games Toggle -->
-          <div class="form-check form-switch mb-0">
-            <input 
-              class="form-check-input" 
-              type="checkbox" 
-              role="switch" 
-              id="showDisqualifiedSwitch"
-              x-model="showDisqualified"
-            >
-            <label class="form-check-label" for="showDisqualifiedSwitch">Show Disqualified Games</label>
-          </div>
-          <!-- Show Games Under Review Toggle -->
-          <div class="form-check form-switch mb-0">
-            <input 
-              class="form-check-input" 
-              type="checkbox" 
-              role="switch" 
-              id="showUnderReviewSwitch"
-              x-model="showUnderReview"
-            >
-            <label class="form-check-label" for="showUnderReviewSwitch">Show Games Under Review</label>
+
+          <!-- Toggles Container -->
+          <div class="d-flex flex-column d-md-flex flex-md-row flex-grow-1 justify-content-start gap-3 gap-md-5">
+            <!-- Column 1 -->
+            <div class="d-flex flex-column gap-3">
+              <!-- Show All Metrics Toggle -->
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="showAllSwitch"
+                  x-model="showAll"
+                  @change="debug = showAll"
+                >
+                <label class="form-check-label" for="showAllSwitch">Show All Metrics</label>
+              </div>
+              <!-- Show Games Under Review Toggle -->
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="showUnderReviewSwitch"
+                  x-model="showUnderReview"
+                >
+                <label class="form-check-label" for="showUnderReviewSwitch">Show Games Under Review</label>
+              </div>
+            </div>
+
+            <!-- Column 2 -->
+            <div class="d-flex flex-column gap-3">
+              <!-- Show Finished Games Toggle -->
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="showFinishedSwitch"
+                  x-model="showFinished"
+                >
+                <label class="form-check-label" for="showFinishedSwitch">Show Finished Games</label>
+              </div>
+              <!-- Hide Qualified Games Toggle -->
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="hideQualifiedSwitch"
+                  x-model="hideQualified"
+                >
+                <label class="form-check-label" for="hideQualifiedSwitch">Hide Qualified Games</label>
+              </div>
+            </div>
+
+            <!-- Column 3 -->
+            <div class="d-flex flex-column gap-3">
+              <!-- Show Disqualified Games Toggle -->
+              <div class="form-check form-switch">
+                <input 
+                  class="form-check-input" 
+                  type="checkbox" 
+                  role="switch" 
+                  id="showDisqualifiedSwitch"
+                  x-model="showDisqualified"
+                >
+                <label class="form-check-label" for="showDisqualifiedSwitch">Show Disqualified Games</label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -107,7 +143,8 @@ export const momentumPage = (data) => {
           <template x-for="game in $store.games.all.filter(g => 
             (showFinished || g.type !== 'final') && 
             (showDisqualified || !g.disqualified) &&
-            (!showUnderReview || g.plusSeventeenStop)
+            (!showUnderReview || g.plusSeventeenStop) &&
+            (!hideQualified || !g.qualified)
           )" :key="game.gameId">
             <li class="list-group-item" :class="{'bg-success-subtle': game.qualified}">
               <div class="row align-items-center g-3">
@@ -132,23 +169,9 @@ export const momentumPage = (data) => {
                       <small class="text-muted">+15:</small>
                       <div class="progress">
                         <div class="progress-bar" 
-                             :class="game.plusFifteen > 0 ? 'bg-success' : 'bg-danger'"
+                             :class="game.plusFifteen > 0 ? 'bg-primary' : 'bg-warning'"
                              :style="{ width: (Math.min(Math.abs(game.plusFifteen) / 15 * 100, 100)) + '%' }"
                              x-text="Math.abs(game.plusFifteen)">
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-
-                  <!-- +13 Progress Bar -->
-                  <template x-if="showAll || game.activeQualifiers.includes('plusThirteen') || game.plusThirteenTime">
-                    <div class="mb-2">
-                      <small class="text-muted">+13:</small>
-                      <div class="progress">
-                        <div class="progress-bar"
-                             :class="game.plusThirteen > 0 ? 'bg-success' : 'bg-danger'"
-                             :style="{ width: (Math.min(Math.abs(game.plusThirteen) / 13 * 100, 100)) + '%' }"
-                             x-text="Math.abs(game.plusThirteen)">
                         </div>
                       </div>
                     </div>
@@ -160,7 +183,7 @@ export const momentumPage = (data) => {
                       <small class="text-muted">+12:</small>
                       <div class="progress">
                         <div class="progress-bar"
-                             :class="game.plusTwelve > 0 ? 'bg-success' : 'bg-danger'"
+                             :class="game.plusTwelve > 0 ? 'bg-primary' : 'bg-warning'"
                              :style="{ width: (Math.min(Math.abs(game.plusTwelve) / 12 * 100, 100)) + '%' }"
                              x-text="Math.abs(game.plusTwelve)">
                         </div>
@@ -174,7 +197,7 @@ export const momentumPage = (data) => {
                       <small class="text-muted">+12₁_₂:</small>
                       <div class="progress">
                         <div class="progress-bar"
-                             :class="game.plusTwelve1_2 > 0 ? 'bg-success' : 'bg-danger'"
+                             :class="game.plusTwelve1_2 > 0 ? 'bg-primary' : 'bg-warning'"
                              :style="{ width: (Math.min(Math.abs(game.plusTwelve1_2) / 12 * 100, 100)) + '%' }"
                              x-text="Math.abs(game.plusTwelve1_2)">
                         </div>
@@ -188,7 +211,7 @@ export const momentumPage = (data) => {
                       <small class="text-muted">+12₂_₂:</small>
                       <div class="progress">
                         <div class="progress-bar"
-                             :class="game.plusTwelve2_2 > 0 ? 'bg-success' : 'bg-danger'"
+                             :class="game.plusTwelve2_2 > 0 ? 'bg-primary' : 'bg-warning'"
                              :style="{ width: (Math.min(Math.abs(game.plusTwelve2_2) / 12 * 100, 100)) + '%' }"
                              x-text="Math.abs(game.plusTwelve2_2)">
                         </div>
@@ -200,7 +223,8 @@ export const momentumPage = (data) => {
                   <template x-if="game.qualified">
                     <div class="mt-2">
                       <i class="bi bi-check-circle-fill me-2" 
-                         :class="game.qualifiedTeam === 'home' ? 'text-success' : 'text-danger'"
+                         :class="game.qualifiedTeam === 'home' ? 'text-primary' : 'text-warning'"
+                         :title="game.qualifiedTeam === 'home' ? 'Home Team Qualified' : 'Away Team Qualified'"
                          title="Qualified"></i>
                       <small>
                         <span x-text="game.qualifiedBy"></span>

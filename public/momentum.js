@@ -30,6 +30,32 @@ document.addEventListener('alpine:init', () => {
   });
 });
 
+// Add getGameData function
+async function getGameData() {
+  try {
+    const response = await fetch('/api/get-data', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ date: formattedDate })
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+      alert('Data loading');
+    } else {
+      alert('Cannot load data');
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('error!');
+  }
+}
+
+// Expose the function to Alpine
+window.getGameData = getGameData;
+
 let formattedDate;
 // get formatted date from query params if available
 const urlParams = new URLSearchParams(window.location.search);

@@ -77,6 +77,18 @@ app.post('/validate', async (c) => {
   return c.json({ success: false }, { status: 401 });
 });
 
+app.post('/api/get-data', async (c) => {
+  const { date } = await c.req.json();
+  
+  try {
+    const result = await c.env.scheduler.getData(date);
+    return c.json({ success: result });
+  } catch (error) {
+    console.error('Error calling getData:', error);
+    return c.json({ success: false });
+  }
+});
+
 // 404 for everything else
 app.all('*', (c) => c.text('Not Found', 404));
 
