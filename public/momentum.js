@@ -71,7 +71,7 @@ if (urlParams.has('date')) {
 
 // Use production WebSocket URL if running locally
 const wsUrl = window.location.hostname === 'localhost' 
-  ? 'wss://hoopadvisors.pw3.workers.dev/connect'  // Production URL
+  ? 'wss://hoopadvisors.matttberkshire.workers.dev//connect'  // Production URL
   : `${window.location.origin.replace('http', 'ws')}/connect`;
 
 let socket = null;
