@@ -136,7 +136,7 @@ export const momentumPage = (data) => {
     <!-- Main Card -->
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Momentum Qualifiers</h5>
+        <h5 class="mb-0">Momentum Qualifiers - <span x-text="date"></span></h5>
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
@@ -250,7 +250,7 @@ export const momentumPage = (data) => {
                     </div>
                   </template>
                   <!-- +17 Stop Status -->
-                  <template x-if="game.plusSeventeenStop">
+                  <template x-if="game.plusSeventeenStop && !game.qualified">
                     <div class="mt-2">
                       <small class="text-muted">+17: 
                         <i class="bi bi-octagon-fill text-danger" title="Stop"></i>
