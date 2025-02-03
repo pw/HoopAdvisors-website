@@ -81,7 +81,7 @@ app.post('/api/get-data', async (c) => {
   const { date } = await c.req.json();
   
   try {
-    const result = await c.env.scheduler.getData(date);
+    const result = await c.env.scrapers.getData(date);
     return c.json({ success: result });
   } catch (error) {
     console.error('Error calling getData:', error);

@@ -136,7 +136,7 @@ export const momentumPage = (data) => {
     <!-- Main Card -->
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Momentum Qualifiers - <span x-text="date"></span></h5>
+        <h5 class="mb-0">Momentum Qualifiers - <span x-text="formattedDate"></span></h5>
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">

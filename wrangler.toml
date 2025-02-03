@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "hoopadvisors"
+name = "hoopadvisors-website"
 main = "./index.js"
 compatibility_date = "2024-10-11"
 assets = { directory = "./public" }
@@ -18,16 +18,15 @@ class_name = "GameServer"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["Server"]
-
-[[migrations]]
-tag = "v2"
-renamed_classes = [{from = "Server", to = "WebsocketServer" }]
-new_classes = ["GameServer"]
+new_classes = ["GameServer", "WebsocketServer"]
 
 [observability]
 enabled = true
 
 [[services]]
-binding = "scheduler"
-service = "hoopadvisors-scheduler"
+binding = "scrapers"
+service = "hoopadvisors-scrapers"
+
+routes = [
+  { pattern = "hoopadvisors.com", custom_domain = true }
+]
