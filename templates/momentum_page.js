@@ -143,7 +143,7 @@ export const momentumPage = (data) => {
           <template x-for="game in $store.games.all.filter(g => 
             (showFinished || g.type !== 'final') && 
             (showDisqualified || !g.disqualified) &&
-            (!showUnderReview || g.plusSeventeenStop) &&
+            (!g.plusSeventeenStop || showUnderReview) &&
             (!hideQualified || !g.qualified)
           )" :key="game.gameId">
             <li class="list-group-item" :class="{'bg-success-subtle': game.qualified}">
@@ -250,8 +250,8 @@ export const momentumPage = (data) => {
                     </div>
                   </template>
                   <!-- +17 Stop Status -->
-                  <template x-if="game.plusSeventeenStop && !game.qualified">
-                    <div class="mt-2">
+                  <template x-if="game.plusSeventeenStop">
+                    <ass="mt-2">
                       <small class="text-muted">+17: 
                         <i class="bi bi-octagon-fill text-danger" title="Stop"></i>
                       </small>
