@@ -1,12 +1,74 @@
-// Initialize the store first
+// Helper function to get formatted date
+function getFormattedDate() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('date')) {
+    return urlParams.get('date');
+  }
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}${month}${day}`;
+}
+
+// WebSocket helper functions
+function createWebSocket(store) {
+  const wsUrl = window.location.hostname === 'localhost'
+    ? 'wss://hoopadvisors-website.matttberkshire.workers.dev/connect'
+    : `${window.location.origin.replace('http', 'ws')}/connect`;
+
+  const socket = new WebSocket(`${wsUrl}?date=${store.formattedDate}`);
+
+  socket.addEventListener('open', (event) => {
+    console.log('WebSocket connected');
+    socket.send(JSON.stringify({ type: 'initial' }));
+  });
+
+  socket.addEventListener('message', (event) => {
+    console.log('message', event);
+    const data = JSON.parse(event.data);
+    
+    if (data.type === 'initial') {
+      data.games.forEach(game => {
+        store.update(game);
+      });
+    } else if (data.type === 'final') {
+      store.update(data);
+      if (!data.qualified) {
+        store.deleteGame(data.gameId);
+      }
+    } else if (data.type === 'update') {
+      store.update(data);
+    }
+  });
+
+  socket.addEventListener('close', (event) => {
+    console.log('WebSocket connection closed, attempting to reconnect...');
+    setTimeout(() => createWebSocket(store), 1000);
+  });
+
+  socket.addEventListener('error', (event) => {
+    console.error('WebSocket error:', event);
+  });
+
+  return socket;
+}
+
+// Initialize Alpine store and register functions
 document.addEventListener('alpine:init', () => {
+  const formattedDate = getFormattedDate();
+
+  // Initialize the store
   Alpine.store('games', {
     all: [],
+    formattedDate: formattedDate,
     
     sortGames() {
       this.all.sort((a, b) => {
-        if (a.qualified && !b.qualified) return -1;
-        if (!a.qualified && b.qualified) return 1;
+        const aQualified = a.qualified && !a.disqualified;
+        const bQualified = b.qualified && !b.disqualified;
+        if (aQualified && !bQualified) return -1;
+        if (!aQualified && bQualified) return 1;
         return b.qualifierSort - a.qualifierSort;
       });
     },
@@ -28,91 +90,33 @@ document.addEventListener('alpine:init', () => {
       this.sortGames();
     }
   });
+
+  // Register global functions that need access to Alpine
+  window.getGameData = async function() {
+    try {
+      const response = await fetch('/api/get-data', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ date: Alpine.store('games').formattedDate })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        alert('Data loading');
+      } else {
+        alert('Cannot load data');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('error!');
+    }
+  };
 });
 
-// Add getGameData function
-async function getGameData() {
-  try {
-    const response = await fetch('/api/get-data', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ date: formattedDate })
-    });
-    
-    const result = await response.json();
-    if (result.success) {
-      alert('Data loading');
-    } else {
-      alert('Cannot load data');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-    alert('error!');
-  }
-}
-
-// Expose the function to Alpine
-window.getGameData = getGameData;
-
-let formattedDate;
-// get formatted date from query params if available
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('date')) {
-  formattedDate = urlParams.get('date');
-} else {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  formattedDate = `${year}${month}${day}`;
-}
-
-// Use production WebSocket URL if running locally
-const wsUrl = window.location.hostname === 'localhost' 
-  ? 'wss://hoopadvisors-website.matttberkshire.workers.dev/connect'  // Production URL
-  : `${window.location.origin.replace('http', 'ws')}/connect`;
-
-let socket = null;
-
-function connectWebSocket() {
-  socket = new WebSocket(`${wsUrl}?date=${formattedDate}`);
-
-  socket.addEventListener('open', (event) => {
-    console.log('WebSocket connected');
-    socket.send(JSON.stringify({ type: 'initial' }));
-  });
-
-  socket.addEventListener('message', (event) => {
-    console.log('message', event);
-    const data = JSON.parse(event.data);
-    
-    // Handle initial connection message with multiple games
-    if (data.type === 'initial') {
-      data.games.forEach(game => {
-        Alpine.store('games').update(game);
-      });
-    } else if (data.type === 'final') {
-      Alpine.store('games').update(data);
-      if (!data.qualified) {
-        Alpine.store('games').deleteGame(data.gameId);
-      }
-    } else if (data.type === 'update') {
-      // Handle regular single-game updates
-      Alpine.store('games').update(data);
-    }
-  });
-
-  socket.addEventListener('close', (event) => {
-    console.log('WebSocket connection closed, attempting to reconnect...');
-    connectWebSocket();
-  });
-
-  socket.addEventListener('error', (event) => {
-    console.error('WebSocket error:', event);
-  });
-}
-
-// Initial connection
-connectWebSocket(); 
+// Initialize WebSocket after DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Start WebSocket connection
+  let socket = createWebSocket(Alpine.store('games'));
+}); 

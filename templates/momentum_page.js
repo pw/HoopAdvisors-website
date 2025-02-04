@@ -10,35 +10,39 @@ export const momentumPage = (data) => {
     showAll: false,
     showUnderReview: false,
     hideQualified: false,
-    date: new URLSearchParams(window.location.search).get('date') || (() => {
-      const now = new Date();
-      return now.getFullYear() + 
-             String(now.getMonth() + 1).padStart(2, '0') + 
-             String(now.getDate()).padStart(2, '0');
-    })(),
     selectedDate: null,
+    formatDateForInput(date) {
+      return date.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');
+    },
+    formatDateForStore(date) {
+      return date.replace(/-/g, '');
+    },
+    init() {
+      this.selectedDate = this.formatDateForInput($store.games.formattedDate);
+    },
     applyDate() {
       if (!this.selectedDate) return;
-      const newDate = this.selectedDate.replace(/-/g, '');
+      const newDate = this.formatDateForStore(this.selectedDate);
       window.location.href = '/qualifiers?date=' + newDate + 
         (this.showAll ? '&debug=true' : '');
     }
-  }" class="container mt-4">
+  }" 
+  x-init="init()"
+  class="container mt-4">
     <!-- Controls Toolbar -->
     <div class="card shadow mb-3">
       <div class="card-body">
-        <div class="d-flex flex-column flex-md-row gap-4">
+        <div class="d-flex flex-column flex-lg-row gap-4">
           <!-- Date Selector -->
           <div class="d-flex flex-column gap-2">
             <div class="d-flex align-items-start gap-2">
-              <label for="dateSelect" class="form-label mb-0">Date:</label>
               <div class="input-group">
                 <input 
                   type="date" 
                   class="form-control" 
                   id="dateSelect"
-                  :value="date.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3')"
-                  @change="selectedDate = $event.target.value"
+                  :value="formatDateForInput(selectedDate)"
+                  @input="selectedDate = $event.target.value"
                 >
                 <button 
                   class="btn btn-primary" 
@@ -60,7 +64,7 @@ export const momentumPage = (data) => {
           </div>
 
           <!-- Toggles Container -->
-          <div class="d-flex flex-column d-md-flex flex-md-row flex-grow-1 justify-content-start gap-3 gap-md-5">
+          <div class="d-flex flex-column d-lg-flex flex-lg-row flex-grow-1 justify-content-start gap-3 gap-lg-5">
             <!-- Column 1 -->
             <div class="d-flex flex-column gap-3">
               <!-- Show All Metrics Toggle -->
@@ -136,7 +140,7 @@ export const momentumPage = (data) => {
     <!-- Main Card -->
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Momentum Qualifiers - <span x-text="formattedDate"></span></h5>
+        <h5 class="mb-0">Momentum Qualifiers</h5>
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
@@ -146,10 +150,13 @@ export const momentumPage = (data) => {
             (!g.plusSeventeenStop || showUnderReview) &&
             (!hideQualified || !g.qualified)
           )" :key="game.gameId">
-            <li class="list-group-item" :class="{'bg-success-subtle': game.qualified}">
+            <li class="list-group-item border-bottom" :class="{
+              'bg-success-subtle': game.qualified && !game.disqualified,
+              'border-success border-opacity-25': game.qualified && !game.disqualified
+            }">
               <div class="row align-items-center g-3">
                 <!-- Left Section: Links and Teams -->
-                <div class="col-12 col-sm-3">
+                <div class="col-7 col-md-3">
                   <div class="d-flex align-items-center">
                     <a :href="game.url" target="_blank" class="me-2" aria-label="View Game Details">
                       <i class="bi bi-box-arrow-up-right"></i>
@@ -161,8 +168,23 @@ export const momentumPage = (data) => {
                   </div>
                 </div>
                 
+                <!-- Right Section: Scores -->
+                <div class="col-5 col-md-2 text-end order-md-last d-flex justify-content-end align-items-center gap-2">
+                  <template x-if="game.spread">
+                    <span class="badge bg-info">
+                      <span x-text="game.spread"></span>
+                    </span>
+                  </template>
+                  <span class="badge bg-secondary fs-6 fw-bold px-2">
+                    <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
+                  </span>
+                  <template x-if="game.type === 'final'">
+                    <span>𝐅</span>
+                  </template>
+                </div>
+
                 <!-- Middle Section: Progress Bars -->
-                <div class="col-12 col-sm-7">
+                <div class="col-12 col-md-7 order-md-2">
                   <!-- +15 Progress Bar -->
                   <template x-if="showAll || game.activeQualifiers.includes('plusFifteen') || game.plusFifteenTime">
                     <div class="mb-2">
@@ -256,21 +278,6 @@ export const momentumPage = (data) => {
                         <i class="bi bi-octagon-fill text-danger" title="Stop"></i>
                       </small>
                     </div>
-                  </template>
-                </div>
-
-                <!-- Right Section: Scores -->
-                <div class="col-12 col-sm-2 text-end">
-                  <template x-if="game.spread">
-                    <span class="badge bg-info me-1">
-                      <span x-text="game.spread"></span>
-                    </span>
-                  </template>
-                  <span class="badge bg-secondary">
-                    <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
-                  </span>
-                  <template x-if="game.type === 'final'">
-                    <span class="ms-1">𝐅</span>
                   </template>
                 </div>
               </div>
