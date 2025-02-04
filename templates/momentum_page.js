@@ -11,6 +11,24 @@ export const momentumPage = (data) => {
     showUnderReview: false,
     hideQualified: false,
     selectedDate: null,
+    teamFilter: '',
+    showControls: false,
+    pinnedGames: new Set(),
+    togglePin(gameId) {
+      if (this.pinnedGames.has(gameId)) {
+        this.pinnedGames.delete(gameId);
+      } else {
+        this.pinnedGames.add(gameId);
+      }
+    },
+    sortGames(games) {
+      return [...games].sort((a, b) => {
+        // First sort by pinned status
+        if (this.pinnedGames.has(a.gameId) && !this.pinnedGames.has(b.gameId)) return -1;
+        if (!this.pinnedGames.has(a.gameId) && this.pinnedGames.has(b.gameId)) return 1;
+        return 0;
+      });
+    },
     formatDateForInput(date) {
       return date.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');
     },
@@ -32,104 +50,130 @@ export const momentumPage = (data) => {
     <!-- Controls Toolbar -->
     <div class="card shadow mb-3">
       <div class="card-body">
-        <div class="d-flex flex-column flex-lg-row gap-4">
-          <!-- Date Selector -->
-          <div class="d-flex flex-column gap-2">
-            <div class="d-flex align-items-start gap-2">
-              <div class="input-group">
-                <input 
-                  type="date" 
-                  class="form-control" 
-                  id="dateSelect"
-                  :value="formatDateForInput(selectedDate)"
-                  @input="selectedDate = $event.target.value"
-                >
-                <button 
-                  class="btn btn-primary" 
-                  type="button"
-                  @click="applyDate()"
-                  :disabled="!selectedDate"
-                >
-                  Apply
-                </button>
-              </div>
-            </div>
+        <div class="d-flex flex-column gap-3">
+          <!-- Essential Controls Row -->
+          <div class="d-flex align-items-center gap-3">
             <button 
-              class="btn btn-primary" 
-              type="button"
-              @click="getGameData()"
+              class="btn btn-outline-secondary" 
+              @click="showControls = !showControls"
             >
-              Get Data
+              <i class="bi" :class="showControls ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
             </button>
+            <div class="input-group">
+              <input 
+                type="date" 
+                class="form-control" 
+                id="dateSelect"
+                :value="formatDateForInput(selectedDate)"
+                @input="selectedDate = $event.target.value"
+              >
+              <button 
+                class="btn btn-primary" 
+                type="button"
+                @click="applyDate()"
+                :disabled="!selectedDate"
+              >
+                Apply
+              </button>
+            </div>
           </div>
 
-          <!-- Toggles Container -->
-          <div class="d-flex flex-column d-lg-flex flex-lg-row flex-grow-1 justify-content-start gap-3 gap-lg-5">
-            <!-- Column 1 -->
-            <div class="d-flex flex-column gap-3">
-              <!-- Show All Metrics Toggle -->
-              <div class="form-check form-switch">
+          <!-- Expanded Controls -->
+          <div x-show="showControls" x-collapse>
+            <!-- Search Bar -->
+            <div class="mb-3">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-search"></i>
+                </span>
                 <input 
-                  class="form-check-input" 
-                  type="checkbox" 
-                  role="switch" 
-                  id="showAllSwitch"
-                  x-model="showAll"
-                  @change="debug = showAll"
+                  type="text" 
+                  class="form-control" 
+                  placeholder="Filter teams..." 
+                  x-model="teamFilter"
                 >
-                <label class="form-check-label" for="showAllSwitch">Show All Metrics</label>
-              </div>
-              <!-- Show Games Under Review Toggle -->
-              <div class="form-check form-switch">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
-                  role="switch" 
-                  id="showUnderReviewSwitch"
-                  x-model="showUnderReview"
-                >
-                <label class="form-check-label" for="showUnderReviewSwitch">Show Games Under Review</label>
               </div>
             </div>
 
-            <!-- Column 2 -->
-            <div class="d-flex flex-column gap-3">
-              <!-- Show Finished Games Toggle -->
-              <div class="form-check form-switch">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
-                  role="switch" 
-                  id="showFinishedSwitch"
-                  x-model="showFinished"
-                >
-                <label class="form-check-label" for="showFinishedSwitch">Show Finished Games</label>
-              </div>
-              <!-- Hide Qualified Games Toggle -->
-              <div class="form-check form-switch">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
-                  role="switch" 
-                  id="hideQualifiedSwitch"
-                  x-model="hideQualified"
-                >
-                <label class="form-check-label" for="hideQualifiedSwitch">Hide Qualified Games</label>
-              </div>
+            <!-- Get Data Button -->
+            <div class="mb-3">
+              <button 
+                class="btn btn-primary" 
+                type="button"
+                @click="getGameData()"
+              >
+                Get Data
+              </button>
             </div>
 
-            <!-- Column 3 -->
-            <div class="d-flex flex-column gap-3">
-              <!-- Show Disqualified Games Toggle -->
-              <div class="form-check form-switch">
-                <input 
-                  class="form-check-input" 
-                  type="checkbox" 
-                  role="switch" 
-                  id="showDisqualifiedSwitch"
-                  x-model="showDisqualified"
-                >
-                <label class="form-check-label" for="showDisqualifiedSwitch">Show Disqualified Games</label>
+            <!-- Toggle Switches -->
+            <div class="d-flex flex-column d-lg-flex flex-lg-row flex-grow-1 justify-content-start gap-3 gap-lg-5">
+              <!-- Column 1 -->
+              <div class="d-flex flex-column gap-3">
+                <!-- Show All Metrics Toggle -->
+                <div class="form-check form-switch">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    id="showAllSwitch"
+                    x-model="showAll"
+                    @change="debug = showAll"
+                  >
+                  <label class="form-check-label" for="showAllSwitch">Show All Metrics</label>
+                </div>
+                <!-- Show Games Under Review Toggle -->
+                <div class="form-check form-switch">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    id="showUnderReviewSwitch"
+                    x-model="showUnderReview"
+                  >
+                  <label class="form-check-label" for="showUnderReviewSwitch">Show Games Under Review</label>
+                </div>
+              </div>
+
+              <!-- Column 2 -->
+              <div class="d-flex flex-column gap-3">
+                <!-- Show Finished Games Toggle -->
+                <div class="form-check form-switch">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    id="showFinishedSwitch"
+                    x-model="showFinished"
+                  >
+                  <label class="form-check-label" for="showFinishedSwitch">Show Finished Games</label>
+                </div>
+                <!-- Hide Qualified Games Toggle -->
+                <div class="form-check form-switch">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    id="hideQualifiedSwitch"
+                    x-model="hideQualified"
+                  >
+                  <label class="form-check-label" for="hideQualifiedSwitch">Hide Qualified Games</label>
+                </div>
+              </div>
+
+              <!-- Column 3 -->
+              <div class="d-flex flex-column gap-3">
+                <!-- Show Disqualified Games Toggle -->
+                <div class="form-check form-switch">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    id="showDisqualifiedSwitch"
+                    x-model="showDisqualified"
+                  >
+                  <label class="form-check-label" for="showDisqualifiedSwitch">Show Disqualified Games</label>
+                </div>
               </div>
             </div>
           </div>
@@ -144,12 +188,15 @@ export const momentumPage = (data) => {
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
-          <template x-for="game in $store.games.all.filter(g => 
+          <template x-for="game in sortGames($store.games.all.filter(g => 
             (showFinished || g.type !== 'final') && 
             (showDisqualified || !g.disqualified) &&
             (!g.plusSeventeenStop || showUnderReview) &&
-            (!hideQualified || !g.qualified)
-          )" :key="game.gameId">
+            (!hideQualified || !(g.qualified && !g.disqualified)) &&
+            (!teamFilter || 
+              g.homeTeam.toLowerCase().includes(teamFilter.toLowerCase()) || 
+              g.awayTeam.toLowerCase().includes(teamFilter.toLowerCase()))
+          ))" :key="game.gameId">
             <li class="list-group-item border-bottom" :class="{
               'bg-success-subtle': game.qualified && !game.disqualified,
               'border-success border-opacity-25': game.qualified && !game.disqualified
@@ -158,6 +205,14 @@ export const momentumPage = (data) => {
                 <!-- Left Section: Links and Teams -->
                 <div class="col-7 col-md-3">
                   <div class="d-flex align-items-center">
+                    <button 
+                      @click="togglePin(game.gameId)" 
+                      class="btn btn-link btn-sm p-0 me-2" 
+                      :class="{ 'text-info': pinnedGames.has(game.gameId) }"
+                      :title="pinnedGames.has(game.gameId) ? 'Unpin Game' : 'Pin Game'"
+                    >
+                      <i class="bi" :class="pinnedGames.has(game.gameId) ? 'bi-pin-fill' : 'bi-pin'"></i>
+                    </button>
                     <a :href="game.url" target="_blank" class="me-2" aria-label="View Game Details">
                       <i class="bi bi-box-arrow-up-right"></i>
                     </a>          
