@@ -91,6 +91,7 @@ export const momentumPage = (data) => {
                   class="form-control" 
                   placeholder="Filter teams..." 
                   x-model="teamFilter"
+                  @keydown.enter="$event.target.blur()"
                 >
               </div>
             </div>
@@ -189,13 +190,15 @@ export const momentumPage = (data) => {
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
           <template x-for="game in sortGames($store.games.all.filter(g => 
-            (showFinished || g.type !== 'final') && 
-            (showDisqualified || !g.disqualified) &&
-            (!g.plusSeventeenStop || showUnderReview) &&
-            (!hideQualified || !(g.qualified && !g.disqualified)) &&
-            (!teamFilter || 
-              g.homeTeam.toLowerCase().includes(teamFilter.toLowerCase()) || 
-              g.awayTeam.toLowerCase().includes(teamFilter.toLowerCase()))
+            pinnedGames.has(g.gameId) || (
+              (showFinished || g.type !== 'final') && 
+              (showDisqualified || !g.disqualified) &&
+              (!g.plusSeventeenStop || showUnderReview) &&
+              (!hideQualified || !(g.qualified && !g.disqualified)) &&
+              (!teamFilter || 
+                g.homeTeam.toLowerCase().includes(teamFilter.toLowerCase()) || 
+                g.awayTeam.toLowerCase().includes(teamFilter.toLowerCase()))
+            )
           ))" :key="game.gameId">
             <li class="list-group-item border-bottom" :class="{
               'bg-success-subtle': game.qualified && !game.disqualified,
