@@ -217,8 +217,8 @@ export const gamePage = (data) => {
                 </div>
               ` : ''}
               <small class="text-muted">Overall Diff: 
-                <span class="${lastPlay.overallDiff > 0 ? 'text-primary' : 'text-warning'}">
-                  ${lastPlay.overallDiff > 0 ? '+' : ''}${lastPlay.overallDiff}
+                <span class="${lastPlay.playScoreDiff > 0 ? 'text-primary' : 'text-warning'}">
+                  ${lastPlay.playScoreDiff > 0 ? '+' : ''}${lastPlay.playScoreDiff}
                 </span>
               </small>
               ${lastPlay.qualified ? html`

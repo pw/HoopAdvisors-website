@@ -3,12 +3,103 @@ import { LayoutWithNavbar } from './components.js'
 
 export const slideRulePage = (data) => {
   const content = html`
-  <main x-data class="container mt-4">
+  <main x-data="{ 
+    showControls: false,
+    selectedDate: null,
+    selectedEndDate: null,
+    isDateRange: false,
+    formatDateForInput(date) {
+      return date.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');
+    },
+    formatDateForStore(date) {
+      return date.replace(/-/g, '');
+    },
+    init() {
+      this.selectedDate = this.formatDateForInput($store.games.formattedDate);
+    },
+    applyDate() {
+      if (!this.selectedDate) return;
+      
+      if (this.isDateRange && this.selectedEndDate) {
+        // For date ranges, use the API endpoint
+        $store.games.fetchHistoricalGames(
+          this.formatDateForStore(this.selectedDate),
+          this.formatDateForStore(this.selectedEndDate)
+        );
+      } else {
+        // For single date, use WebSocket (existing behavior)
+        window.location.href = '/lead_tracker?date=' + this.formatDateForStore(this.selectedDate);
+      }
+    }
+  }" 
+  x-init="init()"
+  class="container mt-4">
+    <!-- Controls Toolbar -->
+    <div class="card shadow mb-3">
+      <div class="card-body">
+        <div class="d-flex flex-column gap-3">
+          <!-- Essential Controls Row -->
+          <div class="d-flex align-items-center gap-3">
+            <button 
+              class="btn btn-outline-secondary" 
+              @click="showControls = !showControls"
+            >
+              <i class="bi" :class="showControls ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+            </button>
+            <div class="input-group">
+              <input 
+                type="date" 
+                class="form-control" 
+                id="dateSelect"
+                :value="formatDateForInput(selectedDate)"
+                @input="selectedDate = $event.target.value"
+              >
+              <button 
+                class="btn btn-primary" 
+                type="button"
+                @click="applyDate()"
+                :disabled="!selectedDate"
+              >
+                Apply
+              </button>
+            </div>
+          </div>
+
+          <!-- Expanded Controls -->
+          <div x-show="showControls" x-collapse>
+            <!-- Get Data Button -->
+            <div class="mb-3">
+              <button 
+                class="btn btn-primary" 
+                type="button"
+                @click="getGameData()"
+              >
+                Get Data
+              </button>
+            </div>
+            
+            <!-- Empty space for future controls -->
+            <div class="d-flex flex-column d-lg-flex flex-lg-row flex-grow-1 justify-content-start gap-3 gap-lg-5">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Card -->
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
         <h5 class="mb-0">10 Point Lead Tracker</h5>
       </div>
       <div class="card-body p-0">
+        <template x-if="$store.games.isLoading">
+          <div class="p-4 text-center">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2 mb-0">Loading games...</p>
+          </div>
+        </template>
         <ul class="list-group list-group-flush">
           <template x-for="game in $store.games.all" :key="game.gameId">
             <li class="list-group-item" 

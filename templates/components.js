@@ -20,7 +20,7 @@ export const Layout = ({ children, title }) => html`
 
 export const Navbar = () => html`
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav x-data="{ currentPath: window.location.pathname }" class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container-fluid">
         <a class="navbar-brand" href="/">HoopAdvisors 🏀🏀🏀</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,15 +29,15 @@ export const Navbar = () => html`
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="/lead_tracker" onclick="this.classList.add('active')" 
-                 :class="{ active: window.location.pathname === '/lead_tracker' }">
-                Lead Tracker
+              <a class="nav-link" href="/qualifiers" 
+                 :class="{ 'active': currentPath === '/qualifiers' }">
+                Qualifiers
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/qualifiers" onclick="this.classList.add('active')"
-                 :class="{ active: window.location.pathname === '/qualifiers' }">
-                Qualifiers
+              <a class="nav-link" href="/lead_tracker" 
+                 :class="{ 'active': currentPath === '/lead_tracker' }">
+                Lead Tracker
               </a>
             </li>
           </ul>

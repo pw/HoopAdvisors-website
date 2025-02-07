@@ -94,6 +94,46 @@ app.post('/api/get-data', async (c) => {
   }
 });
 
+// Helper function to generate dates in range
+function* dateRange(start, end) {
+  let current = new Date(start.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
+  const endDate = new Date(end.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
+  
+  while (current <= endDate) {
+    yield current.toISOString().slice(0,10).replace(/-/g, '');
+    current.setDate(current.getDate() + 1);
+  }
+}
+
+app.get('/api/historical-games', async (c) => {
+  const startDate = c.req.query('start_date');
+  const endDate = c.req.query('end_date') || startDate;
+  
+  try {
+    const results = [];
+    
+    for (const date of dateRange(startDate, endDate)) {
+      const id = c.env.WEBSOCKET_SERVER.idFromName(date);
+      const stub = c.env.WEBSOCKET_SERVER.get(id);
+      const games = await stub.getHistoricalGames();
+      if (games.length > 0) {
+        results.push(...games);
+      }
+    }
+    
+    return c.json({ 
+      success: true, 
+      games: results 
+    });
+  } catch (error) {
+    console.error('Error fetching historical games:', error);
+    return c.json({ 
+      success: false, 
+      error: 'Failed to fetch historical games' 
+    }, 500);
+  }
+});
+
 // 404 for everything else
 app.all('*', (c) => c.text('Not Found', 404));
 
