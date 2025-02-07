@@ -18,6 +18,11 @@ app.use('*', authMiddleware);
 // Route handlers
 app.get('/', async (c) => {
   const isAuthenticated = c.get('isAuthenticated');
+  return c.html(isAuthenticated ? momentumPage() : landing(c.req.url));
+});
+
+app.get('/lead_tracker', async (c) => {
+  const isAuthenticated = c.get('isAuthenticated');
   return c.html(isAuthenticated ? slideRulePage() : landing(c.req.url));
 });
 

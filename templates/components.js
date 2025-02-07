@@ -29,9 +29,9 @@ export const Navbar = () => html`
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="/" onclick="this.classList.add('active')" 
-                 :class="{ active: window.location.pathname === '/' }">
-                Slide Rule
+              <a class="nav-link" href="/lead_tracker" onclick="this.classList.add('active')" 
+                 :class="{ active: window.location.pathname === '/lead_tracker' }">
+                Lead Tracker
               </a>
             </li>
             <li class="nav-item">

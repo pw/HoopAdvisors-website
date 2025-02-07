@@ -6,7 +6,7 @@ export const slideRulePage = (data) => {
   <main x-data class="container mt-4">
     <div class="card shadow">
       <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">Home Team Slide Rule</h5>
+        <h5 class="mb-0">10 Point Lead Tracker</h5>
       </div>
       <div class="card-body p-0">
         <ul class="list-group list-group-flush">
