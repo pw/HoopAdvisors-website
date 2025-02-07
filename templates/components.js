@@ -30,7 +30,7 @@ export const Navbar = () => html`
           <ul class="navbar-nav">
             <li class="nav-item">
               <a class="nav-link" href="/qualifiers" 
-                 :class="{ 'active': currentPath === '/qualifiers' }">
+                 :class="{ 'active': currentPath === '/qualifiers' || currentPath === '/' }">
                 Qualifiers
               </a>
             </li>
