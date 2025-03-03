@@ -341,6 +341,51 @@ export const momentumPage = (data) => {
                       </small>
                     </div>
                   </template>
+                  
+                  <!-- Live Spread (appears when qualified) -->
+                  <template x-if="game.qualified && game.qualifierLiveSpread !== null">
+                    <div class="mt-2 d-flex align-items-center">
+                      <span class="badge bg-success me-2 pulse-animation">LIVE SPREAD</span>
+                      <span class="badge bg-light text-dark border border-success fw-bold">
+                        <span x-text="game.qualifiedTeam === 'home' ? game.homeTeam.substring(0, 3) : game.awayTeam.substring(0, 3)"></span>
+                        <span x-text="game.qualifierLiveSpread === 'ML' ? ' ML' : 
+                          (game.qualifierLiveSpread > 0 ? ' +' + game.qualifierLiveSpread : ' ' + game.qualifierLiveSpread)"></span>
+                      </span>
+                      
+                      <!-- Two-minute wait countdown -->
+                      <template x-if="game.twoMinuteWaitTime">
+                        <span 
+                          class="ms-2 badge bg-warning text-dark" 
+                          x-data="{ 
+                            startTime: Date.now(), // Just use client-side time - simpler
+                            timeRemaining: '2:00',
+                            updateCountdown() {
+                              const elapsed = Date.now() - this.startTime;
+                              const remaining = Math.max(0, 120000 - elapsed); // 2 minutes in ms
+                              
+                              if (remaining <= 0) {
+                                this.timeRemaining = 'READY';
+                                return;
+                              }
+                              
+                              const mins = Math.floor(remaining / 60000);
+                              const secs = Math.floor((remaining % 60000) / 1000);
+                              this.timeRemaining = mins + ':' + (secs < 10 ? '0' : '') + secs;
+                            },
+                            init() {
+                              this.updateCountdown();
+                              setInterval(() => this.updateCountdown(), 1000);
+                            }
+                          }" 
+                          x-init="init()"
+                        >
+                          <i class="bi bi-hourglass-split me-1"></i>
+                          <span x-text="timeRemaining"></span>
+                          <small class="ms-1 text-dark">(<span x-text="game.twoMinuteWaitTime"></span>)</small>
+                        </span>
+                      </template>
+                    </div>
+                  </template>
                   <!-- Disqualified Status -->
                   <template x-if="game.disqualified">
                     <div class="mt-2">

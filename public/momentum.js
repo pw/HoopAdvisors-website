@@ -119,4 +119,19 @@ document.addEventListener('alpine:init', () => {
 document.addEventListener('DOMContentLoaded', () => {
   // Start WebSocket connection
   let socket = createWebSocket(Alpine.store('games'));
+  
+  // Add CSS for pulse animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+    
+    .pulse-animation {
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+  `;
+  document.head.appendChild(style);
 }); 
