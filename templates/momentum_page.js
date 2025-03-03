@@ -228,14 +228,12 @@ export const momentumPage = (data) => {
                 
                 <!-- Right Section: Scores -->
                 <div class="col-5 col-md-2 text-end order-md-last d-flex justify-content-end align-items-center gap-2">
-                  <template x-if="game.spread">
-                    <span class="badge bg-info">
-                      <span x-text="game.spread"></span>
-                    </span>
-                  </template>
+                  <!-- Current Score -->
                   <span class="badge bg-secondary fs-6 fw-bold px-2">
                     <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
                   </span>
+                  
+                  <!-- Show Final indicator if game is over -->
                   <template x-if="game.type === 'final'">
                     <span>𝐅</span>
                   </template>
@@ -243,6 +241,34 @@ export const momentumPage = (data) => {
 
                 <!-- Middle Section: Progress Bars -->
                 <div class="col-12 col-md-7 order-md-2">
+                  <!-- Spread Information -->
+                  <div class="mb-2 d-flex flex-wrap align-items-center" x-show="game.spread">
+                    <!-- Original Spread -->
+                    <span class="badge bg-info me-2">
+                      <i class="bi bi-arrow-down-up me-1"></i>
+                      <span x-text="game.spread"></span>
+                    </span>
+                    
+                    <!-- Adjusted Spreads -->
+                    <template x-if="game.homeAdjustedSpread !== null">
+                      <div class="d-flex align-items-center">
+                        <span class="small text-muted me-1">Adjusted:</span>
+                        <!-- Away Team Adjusted Spread -->
+                        <span class="badge bg-warning text-dark" :title="game.awayTeam + ' Adjusted Spread'">
+                          <span x-text="game.awayTeam.substring(0, 3)"></span>
+                          <span x-text="game.awayAdjustedSpread === 'ML' ? ' ML' : 
+                            (game.awayAdjustedSpread > 0 ? ' +' + game.awayAdjustedSpread : ' ' + game.awayAdjustedSpread)"></span>
+                        </span>
+                        <span class="mx-1">/</span>
+                        <!-- Home Team Adjusted Spread -->
+                        <span class="badge bg-primary text-white" :title="game.homeTeam + ' Adjusted Spread'">
+                          <span x-text="game.homeTeam.substring(0, 3)"></span>
+                          <span x-text="game.homeAdjustedSpread === 'ML' ? ' ML' : 
+                            (game.homeAdjustedSpread > 0 ? ' +' + game.homeAdjustedSpread : ' ' + game.homeAdjustedSpread)"></span>
+                        </span>
+                      </div>
+                    </template>
+                  </div>
                   <!-- +15 Progress Bar -->
                   <template x-if="showAll || game.activeQualifiers.includes('plusFifteen') || game.plusFifteenTime">
                     <div class="mb-2">
