@@ -344,9 +344,9 @@ export const momentumPage = (data) => {
                   
                   <!-- Live Spread (appears when qualified) -->
                   <template x-if="game.qualified && game.qualifierLiveSpread !== null">
-                    <div class="mt-2 d-flex align-items-center">
-                      <span class="badge bg-success me-2 pulse-animation">LIVE SPREAD</span>
-                      <span class="badge bg-light text-dark border border-success fw-bold">
+                    <div class="mt-2 d-flex align-items-center flex-wrap">
+                      <span class="badge bg-success me-2 mb-1 pulse-animation">SPREAD TO TAKE</span>
+                      <span class="badge bg-light text-dark border border-success fw-bold me-2 mb-1">
                         <span x-text="game.qualifiedTeam === 'home' ? game.homeTeam.substring(0, 3) : game.awayTeam.substring(0, 3)"></span>
                         <span x-text="game.qualifierLiveSpread === 'ML' ? ' ML' : 
                           (game.qualifierLiveSpread > 0 ? ' +' + game.qualifierLiveSpread : ' ' + game.qualifierLiveSpread)"></span>
@@ -355,7 +355,7 @@ export const momentumPage = (data) => {
                       <!-- Two-minute wait countdown -->
                       <template x-if="game.twoMinuteWaitTime">
                         <span 
-                          class="ms-2 badge bg-warning text-dark" 
+                          class="badge bg-warning text-dark mb-1" 
                           x-data="{ 
                             startTime: Date.now(), // Just use client-side time - simpler
                             timeRemaining: '2:00',

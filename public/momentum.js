@@ -131,6 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     .pulse-animation {
       animation: pulse 1.5s infinite ease-in-out;
+      font-size: 0.85rem;
+      padding: 6px 8px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
   `;
   document.head.appendChild(style);
