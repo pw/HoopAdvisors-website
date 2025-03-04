@@ -14,6 +14,13 @@ export const momentumPage = (data) => {
     teamFilter: '',
     showControls: false,
     pinnedGames: new Set(),
+    showHiddenGames: false,
+    touchStartX: 0,
+    touchEndX: 0,
+    activeSwipeGameId: null,
+    swipeThreshold: 80, // minimum distance in pixels to trigger swipe
+    swipePosition: {}, // tracks current swipe position for each game
+    
     togglePin(gameId) {
       if (this.pinnedGames.has(gameId)) {
         this.pinnedGames.delete(gameId);
@@ -21,14 +28,84 @@ export const momentumPage = (data) => {
         this.pinnedGames.add(gameId);
       }
     },
+    
+    // Swipe handlers
+    handleTouchStart(e, gameId) {
+      this.touchStartX = e.changedTouches[0].screenX;
+      this.activeSwipeGameId = gameId;
+      
+      // Initialize this game's swipe position if it doesn't exist
+      if (!this.swipePosition[gameId]) {
+        this.swipePosition[gameId] = 0;
+      }
+    },
+    
+    handleTouchMove(e, gameId) {
+      if (this.activeSwipeGameId !== gameId) return;
+      
+      const currentX = e.changedTouches[0].screenX;
+      const diffX = currentX - this.touchStartX;
+      
+      // Limit how far we can swipe based on whether the item is hidden
+      const isHidden = $store.games.isHidden(gameId);
+      
+      if (isHidden) {
+        // If already hidden, only allow swiping right (to unhide)
+        this.swipePosition[gameId] = Math.max(diffX, 0);
+        // Adjust background colors
+        document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#198754'; // Green
+      } else {
+        // If visible, only allow swiping left (to hide)
+        this.swipePosition[gameId] = Math.min(diffX, 0);
+        // Adjust background colors
+        document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#dc3545'; // Red
+      }
+    },
+    
+    handleTouchEnd(e, gameId) {
+      if (this.activeSwipeGameId !== gameId) return;
+      
+      this.touchEndX = e.changedTouches[0].screenX;
+      const diffX = this.touchEndX - this.touchStartX;
+      
+      // Determine if we should hide or unhide based on swipe direction and distance
+      if (diffX < -this.swipeThreshold && !$store.games.isHidden(gameId)) {
+        // Swiped left far enough to hide
+        $store.games.hideGame(gameId);
+        this.swipePosition[gameId] = -100; // Complete the animation
+        
+        // Reset position after animation completes
+        setTimeout(() => {
+          this.swipePosition[gameId] = 0;
+        }, 300);
+      } else if (diffX > this.swipeThreshold && $store.games.isHidden(gameId)) {
+        // Swiped right far enough to unhide
+        $store.games.unhideGame(gameId);
+        this.swipePosition[gameId] = 0;
+      } else {
+        // Didn't swipe far enough, reset position
+        this.swipePosition[gameId] = 0;
+      }
+      
+      this.activeSwipeGameId = null;
+    },
+    
+    unhideAllGames() {
+      $store.games.unhideAllGames();
+    },
+    
     sortGames(games) {
       return [...games].sort((a, b) => {
         // First sort by pinned status
         if (this.pinnedGames.has(a.gameId) && !this.pinnedGames.has(b.gameId)) return -1;
         if (!this.pinnedGames.has(a.gameId) && this.pinnedGames.has(b.gameId)) return 1;
         return 0;
+      }).filter(game => {
+        // Filter out hidden games if showHiddenGames is false
+        return this.showHiddenGames || !$store.games.isHidden(game.gameId);
       });
     },
+    
     formatDateForInput(date) {
       return date.replace(/(\\d{4})(\\d{2})(\\d{2})/, '$1-$2-$3');
     },
@@ -37,6 +114,17 @@ export const momentumPage = (data) => {
     },
     init() {
       this.selectedDate = this.formatDateForInput($store.games.formattedDate);
+      
+      // Load pinned games from localStorage if exists
+      const pinnedGamesFromStorage = localStorage.getItem('pinnedGames');
+      if (pinnedGamesFromStorage) {
+        this.pinnedGames = new Set(JSON.parse(pinnedGamesFromStorage));
+      }
+      
+      // Save pinned games to localStorage when changed
+      this.$watch('pinnedGames', value => {
+        localStorage.setItem('pinnedGames', JSON.stringify([...value]));
+      });
     },
     applyDate() {
       if (!this.selectedDate) return;
@@ -175,6 +263,29 @@ export const momentumPage = (data) => {
                   >
                   <label class="form-check-label" for="showDisqualifiedSwitch">Show Higher Risk Picks</label>
                 </div>
+                
+                <!-- Show Hidden Games Toggle -->
+                <div class="form-check form-switch">
+                  <input 
+                    class="form-check-input" 
+                    type="checkbox" 
+                    role="switch" 
+                    id="showHiddenGamesSwitch"
+                    x-model="showHiddenGames"
+                  >
+                  <label class="form-check-label" for="showHiddenGamesSwitch">Show Hidden Games</label>
+                </div>
+                
+                <!-- Unhide All Games Button -->
+                <div>
+                  <button 
+                    class="btn btn-sm btn-outline-secondary" 
+                    @click="unhideAllGames()"
+                    :disabled="$store.games.hiddenGames.size === 0"
+                  >
+                    <i class="bi bi-eye me-1"></i> Unhide All Games
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -200,12 +311,40 @@ export const momentumPage = (data) => {
                 g.awayTeam.toLowerCase().includes(teamFilter.toLowerCase()))
             )
           ))" :key="game.gameId">
-            <li class="list-group-item border-bottom" :class="{
-              'bg-success-subtle': game.qualified && !game.disqualified,
-              'border-success border-opacity-25': game.qualified && !game.disqualified,
-              'bg-danger-subtle': game.disqualified,
-              'border-danger border-opacity-25': game.disqualified
-            }">
+            <!-- Simplified swipe container with a single dynamic background -->
+            <div class="swipe-container" :id="'game-' + game.gameId">
+              <!-- Background with dynamic color based on swipe direction -->
+              <div class="swipe-background">
+                <!-- Hide icon (shown when swiping left) -->
+                <span class="swipe-action-icon hide-icon" x-show="!$store.games.isHidden(game.gameId)">
+                  <i class="bi bi-eye-slash"></i>
+                  <span>Hide</span>
+                </span>
+                
+                <!-- Unhide icon (shown when swiping right) -->
+                <span class="swipe-action-icon unhide-icon" x-show="$store.games.isHidden(game.gameId)">
+                  <i class="bi bi-eye"></i>
+                  <span>Unhide</span>
+                </span>
+              </div>
+              
+              <!-- The actual game row that will slide -->
+              <li class="list-group-item border-bottom swipe-content" 
+                :class="{
+                  'bg-success-subtle': game.qualified && !game.disqualified,
+                  'border-success border-opacity-25': game.qualified && !game.disqualified,
+                  'bg-danger-subtle': game.disqualified,
+                  'border-danger border-opacity-25': game.disqualified,
+                  'hidden-game': $store.games.isHidden(game.gameId) && showHiddenGames
+                }"
+                :style="{ 
+                  transform: 'translateX(' + (swipePosition[game.gameId] || 0) + 'px)',
+                  transition: activeSwipeGameId === game.gameId ? 'none' : 'transform 0.3s ease'
+                }"
+                @touchstart="handleTouchStart($event, game.gameId)"
+                @touchmove="handleTouchMove($event, game.gameId)"
+                @touchend="handleTouchEnd($event, game.gameId)"
+              >
               <div class="row align-items-center g-3">
                 <!-- Left Section: Links and Teams -->
                 <div class="col-7 col-md-3">

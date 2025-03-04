@@ -62,6 +62,26 @@ document.addEventListener('alpine:init', () => {
   Alpine.store('games', {
     all: [],
     formattedDate: formattedDate,
+    hiddenGames: new Set(JSON.parse(localStorage.getItem('hiddenGames') || '[]')),
+    
+    hideGame(gameId) {
+      this.hiddenGames.add(gameId);
+      localStorage.setItem('hiddenGames', JSON.stringify([...this.hiddenGames]));
+    },
+    
+    unhideGame(gameId) {
+      this.hiddenGames.delete(gameId);
+      localStorage.setItem('hiddenGames', JSON.stringify([...this.hiddenGames]));
+    },
+    
+    unhideAllGames() {
+      this.hiddenGames.clear();
+      localStorage.setItem('hiddenGames', JSON.stringify([]));
+    },
+    
+    isHidden(gameId) {
+      return this.hiddenGames.has(gameId);
+    },
     
     sortGames() {
       this.all.sort((a, b) => {
@@ -127,7 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Start WebSocket connection
   let socket = createWebSocket(Alpine.store('games'));
   
-  // Add CSS for pulse animation
+  // Add CSS for pulse animation and swipe functionality
   const style = document.createElement('style');
   style.textContent = `
     @keyframes pulse {
@@ -142,6 +162,106 @@ document.addEventListener('DOMContentLoaded', () => {
       padding: 6px 8px;
       font-weight: 600;
       letter-spacing: 0.5px;
+    }
+    
+    /* Swipe animation styles */
+    .relative-position {
+      position: relative;
+      touch-action: pan-y;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    .swipe-animation {
+      will-change: transform;
+    }
+    
+    .hidden-game {
+      opacity: 0.7;
+      border-left: 4px solid #dc3545 !important;
+    }
+    
+    /* Swipe container setup - completely different approach */
+    .swipe-container {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: -1px; /* Fix border overlap issue */
+    }
+    
+    /* Unified background panel with dynamic coloring */
+    .swipe-background {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      z-index: 0;
+    }
+    
+    /* Position icons within the background */
+    .hide-icon {
+      margin-left: auto;
+      margin-right: 20px;
+    }
+    
+    .unhide-icon {
+      margin-right: auto;
+      margin-left: 20px;
+    }
+    
+    /* The sliding content */
+    .swipe-content {
+      position: relative;
+      z-index: 1;
+      margin-bottom: 0; /* Override list group margin */
+      background-color: white; /* Ensure it covers background */
+    }
+    
+    /* Style the action icon that appears in the background */
+    .swipe-action-icon {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      padding: 0 20px;
+    }
+    
+    .swipe-action-icon i {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+    
+    /* Override background for qualified/disqualified items */
+    .bg-success-subtle.swipe-content {
+      background-color: rgba(25, 135, 84, 0.1); /* Match Bootstrap success-subtle */
+    }
+    
+    .bg-danger-subtle.swipe-content {
+      background-color: rgba(220, 53, 69, 0.1); /* Match Bootstrap danger-subtle */
+    }
+    
+    /* Hidden game styling - used by filter system */
+    .hidden-game {
+      opacity: 0.7;
+      border-left: 4px solid #dc3545 !important;
+    }
+    
+    /* Add swipe hint indicator for mobile - subtle indicator that swiping is available */
+    @media (max-width: 768px) {
+      .list-group-item:after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        width: 6px;
+        height: 6px;
+        border-top: 2px solid rgba(0,0,0,0.2);
+        border-right: 2px solid rgba(0,0,0,0.2);
+        transform: translateY(-50%) rotate(45deg);
+      }
     }
   `;
   document.head.appendChild(style);
