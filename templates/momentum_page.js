@@ -164,7 +164,7 @@ export const momentumPage = (data) => {
 
               <!-- Column 3 -->
               <div class="d-flex flex-column gap-3">
-                <!-- Show Disqualified Games Toggle -->
+                <!-- Show Higher Risk Picks Toggle -->
                 <div class="form-check form-switch">
                   <input 
                     class="form-check-input" 
@@ -173,7 +173,7 @@ export const momentumPage = (data) => {
                     id="showDisqualifiedSwitch"
                     x-model="showDisqualified"
                   >
-                  <label class="form-check-label" for="showDisqualifiedSwitch">Show Disqualified Games</label>
+                  <label class="form-check-label" for="showDisqualifiedSwitch">Show Higher Risk Picks</label>
                 </div>
               </div>
             </div>
@@ -202,7 +202,9 @@ export const momentumPage = (data) => {
           ))" :key="game.gameId">
             <li class="list-group-item border-bottom" :class="{
               'bg-success-subtle': game.qualified && !game.disqualified,
-              'border-success border-opacity-25': game.qualified && !game.disqualified
+              'border-success border-opacity-25': game.qualified && !game.disqualified,
+              'bg-danger-subtle': game.disqualified,
+              'border-danger border-opacity-25': game.disqualified
             }">
               <div class="row align-items-center g-3">
                 <!-- Left Section: Links and Teams -->
@@ -386,11 +388,11 @@ export const momentumPage = (data) => {
                       </template>
                     </div>
                   </template>
-                  <!-- Disqualified Status -->
+                  <!-- Higher Risk Pick Status -->
                   <template x-if="game.disqualified">
                     <div class="mt-2">
-                      <i class="bi bi-x-circle-fill me-2 text-dark" 
-                         title="Disqualified"></i>
+                      <i class="bi bi-exclamation-triangle-fill me-2 text-danger" 
+                         title="Higher Risk Pick"></i>
                       <small>
                         <span x-text="game.disqualifiedBy"></span>
                         <span class="ms-2" x-text="game.disqualifiedTime"></span>

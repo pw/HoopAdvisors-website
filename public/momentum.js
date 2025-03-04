@@ -65,10 +65,17 @@ document.addEventListener('alpine:init', () => {
     
     sortGames() {
       this.all.sort((a, b) => {
+        // First, push disqualified games to the bottom
+        if (a.disqualified && !b.disqualified) return 1;
+        if (!a.disqualified && b.disqualified) return -1;
+        
+        // Then sort by qualification status
         const aQualified = a.qualified && !a.disqualified;
         const bQualified = b.qualified && !b.disqualified;
         if (aQualified && !bQualified) return -1;
         if (!aQualified && bQualified) return 1;
+        
+        // Finally sort by qualifier score
         return b.qualifierSort - a.qualifierSort;
       });
     },
