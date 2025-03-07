@@ -54,11 +54,13 @@ export const momentumPage = (data) => {
         this.swipePosition[gameId] = Math.max(diffX, 0);
         // Adjust background colors
         document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#198754'; // Green
+        document.querySelector('#game-' + gameId + ' .swipe-background').style.color = '#000'; // Black text
       } else {
         // If visible, only allow swiping left (to hide)
         this.swipePosition[gameId] = Math.min(diffX, 0);
         // Adjust background colors
         document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#dc3545'; // Red
+        document.querySelector('#game-' + gameId + ' .swipe-background').style.color = '#000'; // Black text
       }
     },
     
@@ -376,7 +378,7 @@ export const momentumPage = (data) => {
                   
                   <!-- Show Final indicator if game is over -->
                   <template x-if="game.type === 'final'">
-                    <span>𝐅</span>
+                    <span class="final-indicator">𝐅</span>
                   </template>
                 </div>
 
@@ -385,7 +387,7 @@ export const momentumPage = (data) => {
                   <!-- Spread Information -->
                   <div class="mb-2 d-flex flex-wrap align-items-center" x-show="game.spread">
                     <!-- Original Spread -->
-                    <span class="badge bg-info me-2">
+                    <span class="badge bg-info me-2 unadjusted-spread">
                       <i class="bi bi-arrow-down-up me-1"></i>
                       <span x-text="game.spread"></span>
                     </span>
@@ -395,14 +397,14 @@ export const momentumPage = (data) => {
                       <div class="d-flex align-items-center">
                         <span class="small text-muted me-1">Adjusted:</span>
                         <!-- Away Team Adjusted Spread -->
-                        <span class="badge bg-warning text-dark" :title="game.awayTeam + ' Adjusted Spread'">
+                        <span class="badge away-adjusted-spread bg-warning text-dark" :title="game.awayTeam + ' Adjusted Spread'">
                           <span x-text="game.awayTeam.substring(0, 3)"></span>
                           <span x-text="game.awayAdjustedSpread === 'ML' ? ' ML' : 
                             (game.awayAdjustedSpread > 0 ? ' +' + game.awayAdjustedSpread : ' ' + game.awayAdjustedSpread)"></span>
                         </span>
                         <span class="mx-1">/</span>
                         <!-- Home Team Adjusted Spread -->
-                        <span class="badge bg-primary text-white" :title="game.homeTeam + ' Adjusted Spread'">
+                        <span class="badge bg-primary home-adjusted-spread" :title="game.homeTeam + ' Adjusted Spread'">
                           <span x-text="game.homeTeam.substring(0, 3)"></span>
                           <span x-text="game.homeAdjustedSpread === 'ML' ? ' ML' : 
                             (game.homeAdjustedSpread > 0 ? ' +' + game.homeAdjustedSpread : ' ' + game.homeAdjustedSpread)"></span>
@@ -496,7 +498,7 @@ export const momentumPage = (data) => {
                       <!-- Two-minute wait countdown -->
                       <template x-if="game.twoMinuteWaitTime">
                         <span 
-                          class="badge bg-warning text-dark mb-1" 
+                          class="badge bg-warning text-dark mb-1 two-minute-wait" 
                           x-data="{ 
                             startTime: Date.now(), // Just use client-side time - simpler
                             timeRemaining: '2:00',
