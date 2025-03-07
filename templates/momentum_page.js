@@ -52,15 +52,35 @@ export const momentumPage = (data) => {
       if (isHidden) {
         // If already hidden, only allow swiping right (to unhide)
         this.swipePosition[gameId] = Math.max(diffX, 0);
-        // Adjust background colors
-        document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#198754'; // Green
-        document.querySelector('#game-' + gameId + ' .swipe-background').style.color = '#000'; // Black text
+        
+        // Only set background color if actively swiping
+        if (diffX > 10) {
+          // Adjust background colors
+          document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#198754'; // Green
+          document.querySelector('#game-' + gameId + ' .swipe-background').style.color = '#000'; // Black text
+          // Show the unhide icon
+          document.querySelector('#game-' + gameId + ' .unhide-icon').style.opacity = '1';
+        } else {
+          // Hide icons when not actively swiping
+          document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = 'transparent';
+          document.querySelector('#game-' + gameId + ' .unhide-icon').style.opacity = '0';
+        }
       } else {
         // If visible, only allow swiping left (to hide)
         this.swipePosition[gameId] = Math.min(diffX, 0);
-        // Adjust background colors
-        document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#dc3545'; // Red
-        document.querySelector('#game-' + gameId + ' .swipe-background').style.color = '#000'; // Black text
+        
+        // Only set background color if actively swiping
+        if (diffX < -10) {
+          // Adjust background colors
+          document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = '#dc3545'; // Red
+          document.querySelector('#game-' + gameId + ' .swipe-background').style.color = '#000'; // Black text
+          // Show the hide icon
+          document.querySelector('#game-' + gameId + ' .hide-icon').style.opacity = '1';
+        } else {
+          // Hide icons when not actively swiping
+          document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = 'transparent';
+          document.querySelector('#game-' + gameId + ' .hide-icon').style.opacity = '0';
+        }
       }
     },
     
@@ -87,9 +107,29 @@ export const momentumPage = (data) => {
       } else {
         // Didn't swipe far enough, reset position
         this.swipePosition[gameId] = 0;
+        
+        // Reset the background and hide icons
+        document.querySelector('#game-' + gameId + ' .swipe-background').style.backgroundColor = 'transparent';
+        document.querySelector('#game-' + gameId + ' .hide-icon').style.opacity = '0';
+        document.querySelector('#game-' + gameId + ' .unhide-icon').style.opacity = '0';
       }
       
       this.activeSwipeGameId = null;
+      
+      // After any swipe action, ensure the background is reset
+      setTimeout(() => {
+        if (!this.activeSwipeGameId) {
+          // Reset background color on all items
+          document.querySelectorAll('.swipe-background').forEach(el => {
+            el.style.backgroundColor = 'transparent';
+          });
+          
+          // Hide all swipe icons
+          document.querySelectorAll('.swipe-action-icon').forEach(el => {
+            el.style.opacity = '0';
+          });
+        }
+      }, 300);
     },
     
     unhideAllGames() {

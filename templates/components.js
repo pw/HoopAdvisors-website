@@ -154,11 +154,64 @@ export const Layout = ({ children, title }) => html`
       color: #000 !important;
     }
     
-    /* Pins and arrows in the game list should be white */
+    /* Pins and arrows in the game list should be white and moderately larger */
     .list-group-item .bi-pin, 
     .list-group-item .bi-pin-fill, 
     .list-group-item .bi-box-arrow-up-right {
       color: white !important;
+      font-size: 1.5rem !important; /* Moderately larger icon size */
+    }
+    
+    /* Normal button spacing with current icon size */
+    .list-group-item .btn-link,
+    .list-group-item a[aria-label="View Game Details"] {
+      padding: 0 !important; /* No padding */
+      margin-right: 0.4rem !important; /* Normal spacing */
+      display: inline-block !important;
+    }
+    
+    /* Responsive adjustments for mobile */
+    @media (max-width: 768px) {
+      /* Add more vertical space in the game rows for mobile */
+      .list-group-item {
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+      }
+      
+      /* Ensure the team name has enough space */
+      .list-group-item .text-truncate {
+        max-width: 150px !important;
+        display: inline-block !important;
+      }
+      
+      /* Stack the icons on very small screens if needed */
+      @media (max-width: 400px) {
+        .list-group-item .d-flex.align-items-center {
+          flex-wrap: wrap !important;
+        }
+        
+        .list-group-item .btn-link,
+        .list-group-item a[aria-label="View Game Details"] {
+          margin-bottom: 0.25rem !important;
+          margin-right: 0.25rem !important; /* Keep normal spacing */
+        }
+      }
+    }
+    
+    /* Fix swipe actions display */
+    .swipe-background {
+      background-color: transparent !important;
+    }
+    
+    /* Hide swipe action icons until actually swiping */
+    .swipe-action-icon {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    /* Only show the swipe action icons when actively swiping */
+    .swipe-container[style*="translateX"] .swipe-action-icon {
+      opacity: 1;
     }
     
     /* Game time info should be white in list items */
