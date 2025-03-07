@@ -48,13 +48,18 @@ export const Layout = ({ children, title }) => html`
       color: rgb(49, 206, 128) !important;
     }
     
-    /* Home team bar color (blue) with black text */
+    /* Home team bar color (green) with black text */
     .progress-bar.bg-primary {
       background-color: rgb(49, 206, 128) !important;
       color: #000 !important;
     }
     
-    /* Away team bar color (change from yellow to white) with black text */
+    /* Make all progress bars have a light green background by default */
+    .progress {
+      background-color: rgba(49, 206, 128, 0.2) !important;
+    }
+    
+    /* Away team bar color (white with black text) */
     .progress-bar.bg-warning {
       background-color: #fff !important;
       color: #000 !important;
@@ -122,7 +127,30 @@ export const Layout = ({ children, title }) => html`
     .badge.bg-warning.text-dark.mb-1.two-minute-wait span,
     span.two-minute-wait span,
     span.two-minute-wait small,
-    span.two-minute-wait i {
+    span.two-minute-wait i,
+    .two-minute-wait-time,
+    .two-minute-wait-time *,
+    .two-minute-wait small.text-dark {
+      color: #000 !important;
+    }
+    
+    /* Force all text content to be black, including parentheses */
+    .two-minute-wait small.ms-1,
+    .two-minute-wait-time,
+    .two-minute-wait .paren,
+    .two-minute-wait span.paren {
+      color: #000 !important;
+    }
+    
+    /* Important override for ALL elements inside two-minute-wait */
+    .two-minute-wait *,
+    .two-minute-wait > *,
+    .two-minute-wait > * > *,
+    .two-minute-wait-time *,
+    .two-minute-wait-time > *,
+    .two-minute-wait span,
+    .two-minute-wait i,
+    span.two-minute-wait-time span {
       color: #000 !important;
     }
     
@@ -200,8 +228,15 @@ export const Layout = ({ children, title }) => html`
     }
     
     /* For the spread to take display */
-    .badge.bg-light.text-dark {
+    .badge.bg-light.text-dark.spread-to-take-value,
+    .spread-to-take-value {
       background-color: rgb(49, 206, 128) !important;
+      color: white !important;
+    }
+    
+    /* Make sure all text inside the spread-to-take-value is white */
+    .spread-to-take-value *,
+    .spread-to-take-value span {
       color: white !important;
     }
     

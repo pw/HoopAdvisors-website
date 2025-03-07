@@ -489,7 +489,7 @@ export const momentumPage = (data) => {
                   <template x-if="game.qualified && game.qualifierLiveSpread !== null">
                     <div class="mt-2 d-flex align-items-center flex-wrap">
                       <span class="badge bg-success me-2 mb-1 pulse-animation">SPREAD TO TAKE</span>
-                      <span class="badge bg-light text-dark border border-success fw-bold me-2 mb-1">
+                      <span class="badge bg-light text-dark border border-success fw-bold me-2 mb-1 spread-to-take-value">
                         <span x-text="game.qualifiedTeam === 'home' ? game.homeTeam.substring(0, 3) : game.awayTeam.substring(0, 3)"></span>
                         <span x-text="game.qualifierLiveSpread === 'ML' ? ' ML' : 
                           (game.qualifierLiveSpread > 0 ? ' +' + game.qualifierLiveSpread : ' ' + game.qualifierLiveSpread)"></span>
@@ -524,7 +524,7 @@ export const momentumPage = (data) => {
                         >
                           <i class="bi bi-hourglass-split me-1"></i>
                           <span x-text="timeRemaining"></span>
-                          <small class="ms-1 text-dark">(<span x-text="game.twoMinuteWaitTime"></span>)</small>
+                          <small class="ms-1 text-dark two-minute-wait-time"><span class="paren">(</span><span x-text="game.twoMinuteWaitTime"></span><span class="paren">)</span></small>
                         </span>
                       </template>
                     </div>
