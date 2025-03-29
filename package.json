@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "hono": "^4.6.8",
-    "wrangler": "^3.81.0"
+    "hono": "^4.6.8"
+  },
+  "devDependencies": {
+    "wrangler": "^4.6.0"
   }
 }
