@@ -430,6 +430,27 @@ export const Layout = ({ children, title }) => html`
       color: rgba(255, 255, 255, 0.8) !important;
     }
     
+    /* Make momentum metrics labels white with slight transparency */
+    .momentum-metric small {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    /* Style the "Segments Progress" label */
+    .card-header .col-md-4 small.text-muted {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    /* Style the other text in the momentum metrics area */
+    .card-header .col-md-4 .mt-2 small.text-muted,
+    .card-header .col-md-4 .mt-3 small.text-muted {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    /* Style the date indicator in upper right */
+    .card-header .text-muted {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
     /* All text in the list-group-item should be white by default */
     .list-group-item span:not(.badge span):not(.unadjusted-spread span):not(.away-adjusted-spread span):not(.home-adjusted-spread span):not(.final-indicator):not(.two-minute-wait span),
     .list-group-item i.bi-check-circle-fill ~ span {

@@ -277,9 +277,7 @@ export const gamePage = (data) => {
                 <td class="text-nowrap" style="width: 1%">${play.awayPlayScore}</td>
                 <td class="text-nowrap" style="width: 1%">${play.homePlayScore}</td>
                 <td class="text-nowrap text-end" style="width: 1%">
-                  ${play.playScoreDiff > 0 ? `<span class="text-primary">+${play.playScoreDiff}</span>` : 
-                    play.playScoreDiff < 0 ? `<span class="text-warning">${play.playScoreDiff}</span>` : 
-                    play.playScoreDiff}
+                  ${play.playScoreDiff > 0 ? `+${play.playScoreDiff}` : play.playScoreDiff}
                 </td>
                 <td class="text-nowrap text-end" style="width: 1%">${play.awaySegmentsPoints}</td>
                 <td class="text-nowrap text-end" style="width: 1%">${play.homeSegmentsPoints}</td>
