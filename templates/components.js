@@ -49,7 +49,7 @@ export const Layout = ({ children, title }) => html`
     }
     
     /* Home team bar color (green) with black text */
-    .progress-bar.bg-primary {
+    .progress-bar.bg-primary, div[role="progressbar"].bg-primary {
       background-color: rgb(49, 206, 128) !important;
       color: #000 !important;
     }
@@ -60,14 +60,14 @@ export const Layout = ({ children, title }) => html`
     }
     
     /* Away team bar color (white with black text) */
-    .progress-bar.bg-warning {
+    .progress-bar.bg-warning, div[role="progressbar"].bg-warning {
       background-color: #fff !important;
       color: #000 !important;
     }
     
     /* Team badges - match the progress bar colors */
     /* Home team badges (green with black text) */
-    .badge.bg-primary, .home-adjusted-spread {
+    .badge.bg-primary, .home-adjusted-spread, .card .badge.bg-primary {
       background-color: rgb(49, 206, 128) !important;
       color: #000 !important;
     }
@@ -78,7 +78,7 @@ export const Layout = ({ children, title }) => html`
     }
     
     /* Away team badges (white with black text) */
-    .badge.bg-warning {
+    .badge.bg-warning, .card .badge.bg-warning {
       background-color: #fff !important;
       color: #000 !important;
     }
@@ -341,6 +341,15 @@ export const Layout = ({ children, title }) => html`
       color: rgb(49, 206, 128) !important;
     }
     
+    /* Game page segment point counts */
+    .d-flex.justify-content-between.mt-1 small.text-primary {
+      color: rgb(49, 206, 128) !important;
+    }
+    
+    .d-flex.justify-content-between.mt-1 small.text-warning {
+      color: white !important;
+    }
+    
     /* Form check labels */
     .form-check-label {
       color: #000 !important;
@@ -353,11 +362,17 @@ export const Layout = ({ children, title }) => html`
     }
     
     /* Team qualified indicators - just the checkmark icons */
-    .list-group-item .text-primary {
+    .list-group-item .text-primary,
+    .card-body .text-primary,
+    .momentum-metrics .text-primary,
+    .card .text-primary {
       color: rgb(49, 206, 128) !important;
     }
     
-    .list-group-item .text-warning {
+    .list-group-item .text-warning,
+    .card-body .text-warning,
+    .momentum-metrics .text-warning,
+    .card .text-warning {
       color: white !important;
     }
     
@@ -382,6 +397,37 @@ export const Layout = ({ children, title }) => html`
     .list-group-item .checkmark-row span,
     .list-group-item .segment-info {
       color: white !important;
+    }
+    
+    /* Game page specific segment differential styling */
+    /* Change segment differential boxes to have dark background */
+    .col-md-3 .card {
+      background-color: #000 !important;
+    }
+    
+    .col-md-3 .card-body {
+      background-color: #000 !important;
+    }
+    
+    .col-md-3 .card-body small.text-primary {
+      color: rgb(49, 206, 128) !important;
+    }
+    
+    .col-md-3 .card-body small.text-warning {
+      color: white !important;
+    }
+    
+    .col-md-3 .card-body h6.text-primary {
+      color: rgb(49, 206, 128) !important;
+    }
+    
+    .col-md-3 .card-body h6.text-warning {
+      color: white !important;
+    }
+    
+    /* Make segment time labels (20:00-15:00 1H) white instead of muted gray */
+    .col-md-3 .card-body small.text-muted {
+      color: rgba(255, 255, 255, 0.8) !important;
     }
     
     /* All text in the list-group-item should be white by default */
