@@ -30,3 +30,6 @@ service = "hoopadvisors-scrapers"
 routes = [
   { pattern = "hoopadvisors.com", custom_domain = true }
 ]
+
+[limits]
+cpu_ms = 300_000
