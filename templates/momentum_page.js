@@ -26,14 +26,14 @@ export const momentumPage = (data) => {
     formatSpread(spread) {
       if (spread === 'ML' || spread === null) return 'ML';
       const numSpread = parseFloat(spread);
-      return numSpread > 0 ? `+${numSpread}` : `${numSpread}`;
+      return numSpread > 0 ? '+' + numSpread : String(numSpread);
     },
     
     // Process odds data for current date
     async processOdds() {
       this.processingOdds = true;
       try {
-        const response = await fetch(`/api/process-odds/${$store.games.formattedDate}`, {
+        const response = await fetch('/api/process-odds/' + $store.games.formattedDate, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -43,11 +43,11 @@ export const momentumPage = (data) => {
         const result = await response.json();
         
         if (result.success) {
-          alert(`Success! ${result.message}`);
+          alert('Success!' + result.message);
           // Reload the page to see updated results
           window.location.reload();
         } else {
-          alert(`Error: ${result.error || 'Failed to process odds data'}`);
+          alert('Error: ' + (result.error || 'Failed to process odds data'));
         }
       } catch (error) {
         console.error('Error processing odds:', error);
@@ -265,22 +265,24 @@ export const momentumPage = (data) => {
             <!-- Data Buttons -->
             <div class="mb-3 d-flex gap-2">
               <button 
-                class="btn btn-primary" 
+                class="btn btn-outline-success bg-success border-success" 
                 type="button"
                 @click="getGameData()"
+                style="color: #000000 !important; font-weight: bold;"
               >
                 Get Data
               </button>
               
               <button 
-                class="btn btn-info" 
+                class="btn btn-outline-success bg-success border-success" 
                 type="button"
                 @click="processOdds()"
                 :disabled="processingOdds"
+                style="color: #000000 !important; font-weight: bold;"
               >
                 <span x-show="!processingOdds">Process Odds Data</span>
                 <span x-show="processingOdds">
-                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  <span class="spinner-border spinner-border-sm text-dark" role="status" aria-hidden="true"></span>
                   Processing...
                 </span>
               </button>
@@ -657,9 +659,11 @@ export const momentumPage = (data) => {
                       <!-- Show details for matches -->
                       <template x-if="game.oddsResult.matchDetails">
                         <small class="text-muted">
-                          <span x-text="game.oddsResult.matchDetails.bookmaker"></span> offered
+                          <span x-text="game.oddsResult.matchDetails.bookmaker"></span>
+                          <span> offered </span>
                           <strong x-text="formatSpread(game.oddsResult.matchDetails.spreadOffered)"></strong>
-                          at <span x-text="game.oddsResult.matchDetails.timestamp.slice(11, 16)"></span>
+                          <span> at </span>
+                          <span x-text="game.oddsResult.matchDetails.timestamp.slice(11, 16)"></span>
                         </small>
                       </template>
                       
