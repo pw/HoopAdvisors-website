@@ -20,6 +20,42 @@ export const momentumPage = (data) => {
     activeSwipeGameId: null,
     swipeThreshold: 80, // minimum distance in pixels to trigger swipe
     swipePosition: {}, // tracks current swipe position for each game
+    processingOdds: false,
+    
+    // Format spread for display
+    formatSpread(spread) {
+      if (spread === 'ML' || spread === null) return 'ML';
+      const numSpread = parseFloat(spread);
+      return numSpread > 0 ? `+${numSpread}` : `${numSpread}`;
+    },
+    
+    // Process odds data for current date
+    async processOdds() {
+      this.processingOdds = true;
+      try {
+        const response = await fetch(`/api/process-odds/${$store.games.formattedDate}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          alert(`Success! ${result.message}`);
+          // Reload the page to see updated results
+          window.location.reload();
+        } else {
+          alert(`Error: ${result.error || 'Failed to process odds data'}`);
+        }
+      } catch (error) {
+        console.error('Error processing odds:', error);
+        alert('Failed to process odds data');
+      } finally {
+        this.processingOdds = false;
+      }
+    },
     
     togglePin(gameId) {
       if (this.pinnedGames.has(gameId)) {
@@ -226,14 +262,27 @@ export const momentumPage = (data) => {
               </div>
             </div>
 
-            <!-- Get Data Button -->
-            <div class="mb-3">
+            <!-- Data Buttons -->
+            <div class="mb-3 d-flex gap-2">
               <button 
                 class="btn btn-primary" 
                 type="button"
                 @click="getGameData()"
               >
                 Get Data
+              </button>
+              
+              <button 
+                class="btn btn-info" 
+                type="button"
+                @click="processOdds()"
+                :disabled="processingOdds"
+              >
+                <span x-show="!processingOdds">Process Odds Data</span>
+                <span x-show="processingOdds">
+                  <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  Processing...
+                </span>
               </button>
             </div>
 
@@ -585,10 +634,39 @@ export const momentumPage = (data) => {
                   </template>
                   <!-- +17 Stop Status -->
                   <template x-if="game.plusSeventeenStop">
-                    <ass="mt-2">
+                    <div class="mt-2">
                       <small class="text-muted">+17: 
                         <i class="bi bi-octagon-fill text-danger" title="Stop"></i>
                       </small>
+                    </div>
+                  </template>
+                  
+                  <!-- Odds API Results Display -->
+                  <template x-if="game.oddsResult">
+                    <div class="mt-2 d-flex align-items-center flex-wrap">
+                      <span class="badge me-2"
+                        :class="{
+                          'bg-success': game.oddsResult.result === 'WINNER',
+                          'bg-danger': game.oddsResult.result === 'LOSER',
+                          'bg-secondary': game.oddsResult.result === 'NO LINE'
+                        }"
+                      >
+                        <span x-text="game.oddsResult.result"></span>
+                      </span>
+                      
+                      <!-- Show details for matches -->
+                      <template x-if="game.oddsResult.matchDetails">
+                        <small class="text-muted">
+                          <span x-text="game.oddsResult.matchDetails.bookmaker"></span> offered
+                          <strong x-text="formatSpread(game.oddsResult.matchDetails.spreadOffered)"></strong>
+                          at <span x-text="game.oddsResult.matchDetails.timestamp.slice(11, 16)"></span>
+                        </small>
+                      </template>
+                      
+                      <!-- Show reason for NO LINE -->
+                      <template x-if="game.oddsResult.result === 'NO LINE' && game.oddsResult.reason">
+                        <small class="text-muted ms-1" x-text="game.oddsResult.reason"></small>
+                      </template>
                     </div>
                   </template>
                 </div>

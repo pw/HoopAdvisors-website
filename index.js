@@ -94,6 +94,29 @@ app.post('/api/get-data', async (c) => {
   }
 });
 
+app.post('/api/process-odds/:date', async (c) => {
+  const date = c.req.param('date');
+  
+  // Validate date format (YYYYMMDD)
+  if (!/^\d{8}$/.test(date)) {
+    return c.json({ success: false, error: "Invalid date format" }, 400);
+  }
+  
+  try {
+    // Get the WebSocketServer for this date
+    const websocketServerId = c.env.WEBSOCKET_SERVER.idFromName(date);
+    const websocketServer = c.env.WEBSOCKET_SERVER.get(websocketServerId);
+    
+    // Process odds data
+    const result = await websocketServer.processOddsData(date);
+    
+    return c.json({ success: true, ...result });
+  } catch (error) {
+    console.error('Error processing odds data:', error);
+    return c.json({ success: false, error: error.message }, 500);
+  }
+});
+
 // Helper function to generate dates in range
 function* dateRange(start, end) {
   let current = new Date(start.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3'));
