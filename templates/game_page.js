@@ -38,7 +38,7 @@ export const gamePage = (data) => {
         </div>
         
         <div class="row g-3">
-          <!-- Segment Differentials -->
+          <!-- Segment Differentials and All Qualifiers -->
           <div class="col-md-8">
             <h5 class="mb-3">5-Minute Segment Differentials</h5>
             <div class="row g-2">
@@ -158,8 +158,33 @@ export const gamePage = (data) => {
                 </div>
               </div>
             </div>
+
+            <!-- All Qualifiers Section -->
+            ${lastPlay.allQualifiers && lastPlay.allQualifiers.length > 0 ? html`
+              <div class="mt-3">
+                <h5 class="mb-2">All Qualifiers (${lastPlay.allQualifiers.length})</h5>
+                <div class="row g-2">
+                  ${raw(lastPlay.allQualifiers.map(q => `
+                    <div class="col-md-3 mb-2">
+                      <div class="card h-100">
+                        <div class="card-body p-2">
+                          <small class="text-muted">${q.type} at ${q.gameTime}</small>
+                          <h6 class="mb-0 ${q.team === 'home' ? 'text-primary' : 'text-warning'}">
+                            ${q.team === 'home' ? 'HOME' : 'AWAY'}
+                          </h6>
+                          <div class="d-flex justify-content-between">
+                            <small class="text-warning">${q.awayScore}</small>
+                            <small class="text-primary">${q.homeScore}</small>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  `).join(''))}
+                </div>
+              </div>
+            ` : ''}
           </div>
-          
+
           <!-- Momentum Metrics -->
           <div class="col-md-4">
             <h5 class="mb-3">Momentum Metrics</h5>
