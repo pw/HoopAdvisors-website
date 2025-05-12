@@ -279,24 +279,32 @@ export const Layout = ({ children, title }) => html`
       background-color: rgb(49, 206, 128) !important;
       color: white !important;
     }
-    
+
     /* For the spread to take display */
     .badge.bg-light.text-dark.spread-to-take-value,
     .spread-to-take-value {
-      background-color: rgb(49, 206, 128) !important;
-      color: white !important;
+      background-color: #ADFF2F !important; /* Highlighter green */
+      color: black !important;
+      font-size: 1.2rem !important;
+      padding: 8px 12px !important;
+      font-weight: 700 !important;
     }
-    
-    /* Make sure all text inside the spread-to-take-value is white */
+
+    /* Make sure all text inside the spread-to-take-value is black */
     .spread-to-take-value *,
     .spread-to-take-value span {
-      color: white !important;
+      color: black !important;
     }
-    
+
     /* Spread to Take label */
-    .badge.bg-success.pulse-animation {
-      background-color: rgb(49, 206, 128) !important;
-      color: white !important;
+    .badge.bg-success.pulse-animation,
+    .larger-spread-pill {
+      background-color: #ADFF2F !important; /* Highlighter green */
+      color: black !important;
+      font-size: 1.2rem !important;
+      padding: 8px 12px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.8px !important;
     }
     
     /* Keep qualified and disqualified backgrounds with proper contrast */

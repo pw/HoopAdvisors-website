@@ -155,13 +155,31 @@ document.addEventListener('DOMContentLoaded', () => {
       50% { opacity: 0.6; }
       100% { opacity: 1; }
     }
-    
+
     .pulse-animation {
       animation: pulse 1.5s infinite ease-in-out;
       font-size: 0.85rem;
       padding: 6px 8px;
       font-weight: 600;
       letter-spacing: 0.5px;
+    }
+
+    /* Larger spread pill and value */
+    .larger-spread-pill {
+      font-size: 1rem !important;
+      padding: 6px 10px !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.7px !important;
+      background-color: #ADFF2F !important; /* Highlighter green */
+      color: black !important;
+    }
+
+    .larger-spread-value {
+      font-size: 1rem !important;
+      padding: 6px 10px !important;
+      font-weight: 700 !important;
+      background-color: #ADFF2F !important; /* Highlighter green */
+      color: black !important;
     }
     
     /* Swipe animation styles */
