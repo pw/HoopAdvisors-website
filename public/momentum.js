@@ -14,7 +14,7 @@ function getFormattedDate() {
 // WebSocket helper functions
 function createWebSocket(store) {
   const wsUrl = window.location.hostname === 'localhost'
-    ? 'wss://hoopadvisors-website.matttberkshire.workers.dev/connect'
+    ? 'wss://hoopadvisors-website.pw3.workers.dev/connect'
     : `${window.location.origin.replace('http', 'ws')}/connect`;
 
   const socket = new WebSocket(`${wsUrl}?date=${store.formattedDate}`);

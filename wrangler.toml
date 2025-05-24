@@ -4,6 +4,10 @@ main = "./index.js"
 compatibility_date = "2024-10-11"
 assets = { directory = "./public" }
 
+routes = [
+  { pattern = "hoopadvisors.com", custom_domain = true }
+]
+
 [vars]
 SECRET_KEY = "qz+/vZ3ZBxC3aAZ4a5brJuimOaJUVbsq825PVb/ZprI="
 ACCESS_CODE = "b@ll"
@@ -26,10 +30,6 @@ enabled = true
 [[services]]
 binding = "scrapers"
 service = "hoopadvisors-scrapers"
-
-routes = [
-  { pattern = "hoopadvisors.com", custom_domain = true }
-]
 
 [limits]
 cpu_ms = 300_000
