@@ -72,6 +72,19 @@ export const Layout = ({ children, title }) => html`
       color: #000 !important;
     }
     
+    /* Ensure score numbers in badges are black */
+    .badge.bg-primary span.fw-bold,
+    .badge.bg-warning span.fw-bold {
+      color: #000 !important;
+      font-weight: 700 !important;
+    }
+    
+    /* Force all text in team badges to be black */
+    .badge.bg-primary span,
+    .badge.bg-warning span {
+      color: #000 !important;
+    }
+    
     /* Ensure all elements inside the home spread have black text */
     .home-adjusted-spread * {
       color: #000 !important;
@@ -81,6 +94,7 @@ export const Layout = ({ children, title }) => html`
     .badge.bg-warning, .card .badge.bg-warning {
       background-color: #fff !important;
       color: #000 !important;
+      border: 1px solid #ccc !important;
     }
     
     /* Away adjusted spread - white bg with black text */
@@ -98,6 +112,21 @@ export const Layout = ({ children, title }) => html`
     .btn-primary {
       background-color: rgb(49, 206, 128) !important;
       border-color: rgb(49, 206, 128) !important;
+      color: #000 !important;
+    }
+    
+    /* Green success buttons with black text */
+    .btn-outline-success.bg-success,
+    .btn-success {
+      background-color: rgb(49, 206, 128) !important;
+      border-color: rgb(49, 206, 128) !important;
+      color: #000 !important;
+    }
+    
+    /* Ensure all text inside green buttons is black */
+    .btn-outline-success.bg-success span,
+    .btn-success span,
+    .bg-success.border-success span {
       color: #000 !important;
     }
     
@@ -480,6 +509,28 @@ export const Layout = ({ children, title }) => html`
     /* Make the F (final) indicator white */
     .final-indicator {
       color: white !important;
+    }
+    
+    /* Adjusted Lines box styling */
+    .bg-light.p-2.rounded {
+      background-color: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(49, 206, 128, 0.3) !important;
+    }
+    
+    /* Adjusted Lines header and subtitle */
+    .bg-light.p-2.rounded h6 {
+      color: rgb(49, 206, 128) !important;
+    }
+    
+    .bg-light.p-2.rounded small.text-muted {
+      color: rgba(255, 255, 255, 0.8) !important;
+    }
+    
+    /* Ensure all badge text inside adjusted lines is black */
+    .bg-light .badge.bg-primary span,
+    .bg-light .badge.bg-warning span,
+    .bg-light .badge span {
+      color: #000 !important;
     }
   </style>
 </head>

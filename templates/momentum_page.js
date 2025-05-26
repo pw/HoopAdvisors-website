@@ -43,11 +43,11 @@ export const momentumPage = (data) => {
         const result = await response.json();
         
         if (result.success) {
-          alert('Success!' + result.message);
+          alert('Success! ' + result.message);
           // Reload the page to see updated results
           window.location.reload();
         } else {
-          alert('Error: ' + (result.error || 'Failed to process odds data'));
+          alert('Error: ' + (result.error || result.message || 'Failed to process odds data'));
         }
       } catch (error) {
         console.error('Error processing odds:', error);
@@ -456,16 +456,33 @@ export const momentumPage = (data) => {
                     <a :href="'/game?id=' + game.gameId" target="_blank" class="me-2" aria-label="View Game Details">
                       <i class="bi bi-box-arrow-up-right"></i>
                     </a>                            
-                    <strong x-text="game.awayTeam + ' @ ' + game.homeTeam" class="text-truncate"></strong>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="d-flex align-items-center">
+                        <span class="badge bg-warning text-dark me-1" :title="game.awayTeam + ' Score'">
+                          <span x-text="game.awayTeam"></span>
+                          <span class="ms-1 fw-bold" x-text="game.awayScore"></span>
+                        </span>
+                      </div>
+                      <div>@</div>
+                      <div class="d-flex align-items-center">
+                        <span class="badge bg-primary me-1" :title="game.homeTeam + ' Score'">
+                          <span x-text="game.homeTeam"></span>
+                          <span class="ms-1 fw-bold" x-text="game.homeScore"></span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 
-                <!-- Right Section: Scores -->
+                <!-- Right Section: Original Spread + Final Indicator -->
                 <div class="col-5 col-md-2 text-end order-md-last d-flex justify-content-end align-items-center gap-2">
-                  <!-- Current Score -->
-                  <span class="badge bg-secondary fs-6 fw-bold px-2">
-                    <span x-text="game.awayScore"></span> - <span x-text="game.homeScore"></span>
-                  </span>
+                  <!-- Original Spread (moved from below) -->
+                  <template x-if="game.spread">
+                    <span class="badge bg-info me-2 unadjusted-spread">
+                      <i class="bi bi-arrow-down-up me-1"></i>
+                      <span x-text="game.spread"></span>
+                    </span>
+                  </template>
                   
                   <!-- Show Final indicator if game is over -->
                   <template x-if="game.type === 'final'">
@@ -475,34 +492,8 @@ export const momentumPage = (data) => {
 
                 <!-- Middle Section: Progress Bars -->
                 <div class="col-12 col-md-7 order-md-2">
-                  <!-- Spread Information -->
-                  <div class="mb-2 d-flex flex-wrap align-items-center" x-show="game.spread">
-                    <!-- Original Spread -->
-                    <span class="badge bg-info me-2 unadjusted-spread">
-                      <i class="bi bi-arrow-down-up me-1"></i>
-                      <span x-text="game.spread"></span>
-                    </span>
-                    
-                    <!-- Adjusted Spreads -->
-                    <template x-if="game.homeAdjustedSpread !== null">
-                      <div class="d-flex align-items-center">
-                        <span class="small text-muted me-1">Adjusted:</span>
-                        <!-- Away Team Adjusted Spread -->
-                        <span class="badge away-adjusted-spread bg-warning text-dark" :title="game.awayTeam + ' Adjusted Spread'">
-                          <span x-text="game.awayTeam.substring(0, 3)"></span>
-                          <span x-text="game.awayAdjustedSpread === 'ML' ? ' ML' : 
-                            (game.awayAdjustedSpread > 0 ? ' +' + game.awayAdjustedSpread : ' ' + game.awayAdjustedSpread)"></span>
-                        </span>
-                        <span class="mx-1">/</span>
-                        <!-- Home Team Adjusted Spread -->
-                        <span class="badge bg-primary home-adjusted-spread" :title="game.homeTeam + ' Adjusted Spread'">
-                          <span x-text="game.homeTeam.substring(0, 3)"></span>
-                          <span x-text="game.homeAdjustedSpread === 'ML' ? ' ML' : 
-                            (game.homeAdjustedSpread > 0 ? ' +' + game.homeAdjustedSpread : ' ' + game.homeAdjustedSpread)"></span>
-                        </span>
-                      </div>
-                    </template>
-                  </div>
+                  <!-- Original spread has been moved to the top right corner -->
+                  
                   <!-- +15 Progress Bar -->
                   <template x-if="showAll || game.activeQualifiers.includes('plusFifteen') || game.plusFifteenTime">
                     <div class="mb-2">
