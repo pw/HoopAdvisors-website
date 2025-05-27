@@ -140,6 +140,28 @@ document.addEventListener('alpine:init', () => {
       alert('error!');
     }
   };
+  
+  window.rescrapeGame = async function(gameId, date) {
+    try {
+      const response = await fetch('/api/rescrape-game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ gameId, date })
+      });
+      
+      const result = await response.json();
+      if (result.success) {
+        alert(`Re-scraping game ${gameId}...`);
+      } else {
+        alert('Error: ' + result.error);
+      }
+    } catch (error) {
+      console.error('Error re-scraping game:', error);
+      alert('Failed to re-scrape game');
+    }
+  };
 });
 
 // Initialize WebSocket after DOM is loaded

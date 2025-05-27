@@ -94,6 +94,26 @@ app.post('/api/get-data', async (c) => {
   }
 });
 
+app.post('/api/rescrape-game', async (c) => {
+  const { gameId, date } = await c.req.json();
+  
+  if (!gameId) {
+    return c.json({ success: false, error: 'Game ID is required' }, 400);
+  }
+  
+  if (!date) {
+    return c.json({ success: false, error: 'Date is required' }, 400);
+  }
+  
+  try {
+    const result = await c.env.scrapers.rescrapeGame(gameId, date);
+    return c.json({ success: result });
+  } catch (error) {
+    console.error('Error calling rescrapeGame:', error);
+    return c.json({ success: false, error: error.message });
+  }
+});
+
 app.post('/api/process-odds/:date', async (c) => {
   const date = c.req.param('date');
   
